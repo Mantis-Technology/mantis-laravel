@@ -10,8 +10,6 @@ class CreateTenantsTable extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
     public function up(): void
     {
@@ -20,6 +18,8 @@ class CreateTenantsTable extends Migration
 
             // your custom columns may go here
 
+            $table->string('name');
+
             $table->timestamps();
             $table->json('data')->nullable();
         });
@@ -27,8 +27,6 @@ class CreateTenantsTable extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
     public function down(): void
     {
