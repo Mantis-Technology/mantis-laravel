@@ -2,35 +2,37 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Support\Str;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
 use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 
+#[Fillable([
+    'id',
+    'name',
+    'meta',
+])]
 class Tenant extends BaseTenant implements TenantWithDatabase
 {
     use HasDatabase, HasDomains;
-
-    protected $fillable = [
-        'id',
-        'data',
-        'meta',
-    ];
-
-    public function metadata(): array
+    
+    public static function getCustomColumns(): array
     {
-        return $this->data->meta ?? [];
+        return [
+            'id',
+            'name',
+            'meta',
+        ];
     }
 
-    public function name(): string
+    protected function casts(): array
     {
-        return $this->data->meta->name ?? '';
-    }
-
-    public function imageMetadata(): array
-    {
-        return $this->data->meta->image ?? [];
+        return [
+            'meta' => 'array',
+            'data' => 'array',
+        ];
     }
 
     protected static function booted(): void

@@ -14,7 +14,7 @@ class TenantForm
     {
         return $schema
             ->components([
-                TextInput::make('meta.name')
+                TextInput::make('name')
                     ->required()
                     ->label('Nombre de la empresa')
                     ->live(onBlur: true)
@@ -31,14 +31,9 @@ class TenantForm
 
                 FileUpload::make('meta.image')
                     ->label('Logo')
-                    ->columnSpanFull()
                     ->image()
                     ->directory('tenants/logos')
-                    ->maxSize(1024)
-                    ->imagePreviewHeight('100')
-                    ->automaticallyCropImagesToAspectRatio('1:1')
-                    ->automaticallyResizeImagesToWidth('100')
-                    ->automaticallyResizeImagesToHeight('100'),
+                    ->maxSize(1024),
 
                 Textarea::make('meta.description')
                     ->label('Descripción')
