@@ -15,6 +15,8 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    'central_domain' => env('APP_CENTRAL_DOMAIN', 'localhost'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment
