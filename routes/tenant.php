@@ -23,6 +23,13 @@ Route::middleware([
     InitializeTenancyByDomain::class,
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
-        Route::inertia('/', 'welcome')->name('home');
+
+    Route::inertia('/', 'welcome')->name('home');
+
+    Route::middleware('auth')->group(function () {
+        Route::inertia('/dashboard', 'dashboard')->name('dashboard');
+
+        Route::inertia('/profile', 'Profile/edit')->name('profile.edit');
+    });
 
 });
