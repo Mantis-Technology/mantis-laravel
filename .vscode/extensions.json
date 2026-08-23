@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "xdebug.php-debug",
+    "laravel.vscode-laravel",
+    "zobo.php-intellisense",
+    "bmewburn.vscode-intelephense-client",
+    "ms-vscode-remote.remote-containers",
+    "usernamehw.errorlens",
+    "ms-vscode.vscode-typescript-next"
+  ]
+}

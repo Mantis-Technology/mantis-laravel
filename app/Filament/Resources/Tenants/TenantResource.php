@@ -20,15 +20,16 @@ class TenantResource extends Resource
 {
     protected static ?string $model = Tenant::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::BuildingOffice2;
 
-    protected static ?string $recordTitleAttribute = 'id';
+    protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $navigationLabel = 'Empresas';
 
     protected static ?string $pluralModelLabel = 'Empresas';
 
     protected static ?string $modelLabel = 'Empresa';
+
 
     public static function form(Schema $schema): Schema
     {

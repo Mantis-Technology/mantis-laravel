@@ -24,4 +24,5 @@ Route::middleware([
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
         Route::inertia('/', 'welcome')->name('home');
+
 });

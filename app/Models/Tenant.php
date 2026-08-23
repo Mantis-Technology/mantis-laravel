@@ -42,10 +42,12 @@ class Tenant extends BaseTenant implements TenantWithDatabase
             }
         });
 
-        static::created(function (Tenant $tenant) {
-        $tenant->domains()->create([
-            'domain' => "{$tenant->id}.localhost",
-        ]);
-    });
+        static::saved(function (Tenant $tenant) {
+            if ($tenant->wasChanged('id')) {
+                $tenant->domains()->create([
+                    'domain' => "{$tenant->id}.localhost",
+                ]);
+            }
+        });
     }
 }
