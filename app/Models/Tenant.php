@@ -17,7 +17,6 @@ use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 class Tenant extends BaseTenant implements TenantWithDatabase
 {
     use HasDatabase, HasDomains;
-    
     public static function getCustomColumns(): array
     {
         return [
@@ -42,5 +41,11 @@ class Tenant extends BaseTenant implements TenantWithDatabase
                 $tenant->id = Str::slug($tenant->name);
             }
         });
+
+        static::created(function (Tenant $tenant) {
+        $tenant->domains()->create([
+            'domain' => "{$tenant->id}.localhost",
+        ]);
+    });
     }
 }
