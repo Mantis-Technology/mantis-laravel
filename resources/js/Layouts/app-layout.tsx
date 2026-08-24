@@ -1,12 +1,8 @@
+import { AppSidebar } from '@/components/app-sidebar';
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { PropsWithChildren } from 'react'
 
-import {
-    SidebarInset,
-    SidebarProvider,
-    SidebarTrigger,
-} from '@/components/ui/sidebar'
 
-import { AppSidebar } from '@/components/AppSidebar'
 
 export default function AppLayout({ children }: PropsWithChildren) {
     return (
