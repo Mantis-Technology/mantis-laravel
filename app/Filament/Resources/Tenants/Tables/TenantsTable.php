@@ -18,9 +18,8 @@ class TenantsTable
             ->columns([
                 ImageColumn::make('meta.image')
                     ->label('Logo')
-                    ->disk('tenant_logos')
                     ->circular()
-                    ->size(40),
+                    ->imageSize(40),
 
                 TextColumn::make('name')
                     ->label('Empresa')

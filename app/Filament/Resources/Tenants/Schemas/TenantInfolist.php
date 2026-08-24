@@ -27,7 +27,6 @@ class TenantInfolist
 
                         ImageEntry::make('meta.image')
                             ->hiddenLabel()
-                            ->disk('tenant_logos')
                             ->columnSpanFull()
                             ->imageHeight(200),
 
