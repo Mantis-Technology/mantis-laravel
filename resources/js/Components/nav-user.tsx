@@ -1,160 +1,157 @@
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
 } from '@/components/ui/avatar'
 
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 
 import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    useSidebar,
 } from '@/components/ui/sidebar'
 
-import { Link, router } from '@inertiajs/react'
+import { Link, router, usePage } from '@inertiajs/react'
 
 import {
-  BellIcon,
-  CreditCardIcon,
-  EllipsisVerticalIcon,
-  LogOutIcon,
-  UserIcon,
+    BellIcon,
+    CreditCardIcon,
+    EllipsisVerticalIcon,
+    LogOutIcon,
+    UserIcon,
 } from 'lucide-react'
 
-type User = {
-  name: string
-  email: string
-  avatar?: string | null
-}
+export function NavUser() {
+    const { isMobile } = useSidebar()
+    const { auth } = usePage().props
 
-export function NavUser({
-  user,
-}: {
-  user: User
-}) {
-  const { isMobile } = useSidebar()
+    if (!auth.user) {
+        return null
+    }
 
-  const initials = user.name
-    .split(' ')
-    .filter(Boolean)
-    .map((name) => name[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase()
+    const user = auth.user
 
-  return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger
-            render={
-              <SidebarMenuButton
-                size="lg"
-                className="aria-expanded:bg-muted"
-              />
-            }
-          >
-            <Avatar className="size-8 rounded-lg grayscale">
-              {user.avatar && (
-                <AvatarImage
-                  src={user.avatar}
-                  alt={user.name}
-                />
-              )}
+    const initials = user.name
+        .split(' ')
+        .filter(Boolean)
+        .map((name) => name[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase()
 
-              <AvatarFallback className="rounded-lg">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
+    return (
+        <SidebarMenu>
+            <SidebarMenuItem>
+                <DropdownMenu>
+                    <DropdownMenuTrigger
+                        render={
+                            <SidebarMenuButton
+                                size="lg"
+                                className="aria-expanded:bg-muted"
+                            />
+                        }
+                    >
+                        <Avatar className="size-8 rounded-lg grayscale">
+                            {user.avatar && (
+                                <AvatarImage
+                                    src={user.avatar}
+                                    alt={user.name}
+                                />
+                            )}
 
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">
-                {user.name}
-              </span>
+                            <AvatarFallback className="rounded-lg">
+                                {initials}
+                            </AvatarFallback>
+                        </Avatar>
 
-              <span className="truncate text-xs text-foreground/70">
-                {user.email}
-              </span>
-            </div>
+                        <div className="grid flex-1 text-left text-sm leading-tight">
+                            <span className="truncate font-medium">
+                                {user.name}
+                            </span>
 
-            <EllipsisVerticalIcon className="ml-auto size-4" />
-          </DropdownMenuTrigger>
+                            <span className="truncate text-xs text-foreground/70">
+                                {user.email}
+                            </span>
+                        </div>
 
-          <DropdownMenuContent
-            className="min-w-56"
-            side={isMobile ? 'bottom' : 'right'}
-            align="end"
-            sideOffset={4}
-          >
-            <DropdownMenuGroup>
-              <DropdownMenuLabel className="p-0 font-normal">
-                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <Avatar className="size-8">
-                    {user.avatar && (
-                      <AvatarImage
-                        src={user.avatar}
-                        alt={user.name}
-                      />
-                    )}
+                        <EllipsisVerticalIcon className="ml-auto size-4" />
+                    </DropdownMenuTrigger>
 
-                    <AvatarFallback className="rounded-lg">
-                      {initials}
-                    </AvatarFallback>
-                  </Avatar>
+                    <DropdownMenuContent
+                        className="min-w-56"
+                        side={isMobile ? 'bottom' : 'right'}
+                        align="end"
+                        sideOffset={4}
+                    >
+                        <DropdownMenuGroup>
+                            <DropdownMenuLabel className="p-0 font-normal">
+                                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                                    <Avatar className="size-8">
+                                        {user.avatar && (
+                                            <AvatarImage
+                                                src={user.avatar}
+                                                alt={user.name}
+                                            />
+                                        )}
 
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">
-                      {user.name}
-                    </span>
+                                        <AvatarFallback className="rounded-lg">
+                                            {initials}
+                                        </AvatarFallback>
+                                    </Avatar>
 
-                    <span className="truncate text-xs text-muted-foreground">
-                      {user.email}
-                    </span>
-                  </div>
-                </div>
-              </DropdownMenuLabel>
+                                    <div className="grid flex-1 text-left text-sm leading-tight">
+                                        <span className="truncate font-medium">
+                                            {user.name}
+                                        </span>
 
-              <DropdownMenuItem
-                render={
-                  <Link href="/profile">
-                    <UserIcon />
-                    Profile
-                  </Link>
-                }
-              />
+                                        <span className="truncate text-xs text-muted-foreground">
+                                            {user.email}
+                                        </span>
+                                    </div>
+                                </div>
+                            </DropdownMenuLabel>
 
-              <DropdownMenuItem>
-                <CreditCardIcon />
-                Billing
-              </DropdownMenuItem>
+                            <DropdownMenuItem
+                                render={
+                                    <Link href="/profile">
+                                        <UserIcon />
+                                        Profile
+                                    </Link>
+                                }
+                            />
 
-              <DropdownMenuItem>
-                <BellIcon />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
+                            <DropdownMenuItem>
+                                <CreditCardIcon />
+                                Billing
+                            </DropdownMenuItem>
 
-            <DropdownMenuSeparator />
+                            <DropdownMenuItem>
+                                <BellIcon />
+                                Notifications
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
 
-            <DropdownMenuItem
-              onClick={() => router.post('/logout')}
-            >
-              <LogOutIcon />
-              Log out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
-  )
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem
+                            onClick={() => router.post('/logout')}
+                        >
+                            <LogOutIcon />
+                            Log out
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </SidebarMenuItem>
+        </SidebarMenu>
+    )
 }
