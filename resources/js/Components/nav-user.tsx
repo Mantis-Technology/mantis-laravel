@@ -2,7 +2,8 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "@/components/ui/avatar"
+} from '@/components/ui/avatar'
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,21 +12,24 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu'
+
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import { Link, router } from "@inertiajs/react"
+} from '@/components/ui/sidebar'
+
+import { Link, router } from '@inertiajs/react'
+
 import {
   BellIcon,
   CreditCardIcon,
   EllipsisVerticalIcon,
   LogOutIcon,
   UserIcon,
-} from "lucide-react"
+} from 'lucide-react'
 
 type User = {
   name: string
@@ -39,6 +43,14 @@ export function NavUser({
   user: User
 }) {
   const { isMobile } = useSidebar()
+
+  const initials = user.name
+    .split(' ')
+    .filter(Boolean)
+    .map((name) => name[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
 
   return (
     <SidebarMenu>
@@ -61,12 +73,7 @@ export function NavUser({
               )}
 
               <AvatarFallback className="rounded-lg">
-                {user.name
-                  .split(" ")
-                  .map((name) => name[0])
-                  .join("")
-                  .slice(0, 2)
-                  .toUpperCase()}
+                {initials}
               </AvatarFallback>
             </Avatar>
 
@@ -85,45 +92,38 @@ export function NavUser({
 
           <DropdownMenuContent
             className="min-w-56"
-            side={isMobile ? "bottom" : "right"}
+            side={isMobile ? 'bottom' : 'right'}
             align="end"
             sideOffset={4}
           >
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="size-8">
-                  {user.avatar && (
-                    <AvatarImage
-                      src={user.avatar}
-                      alt={user.name}
-                    />
-                  )}
-
-                  <AvatarFallback className="rounded-lg">
-                    {user.name
-                      .split(" ")
-                      .map((name) => name[0])
-                      .join("")
-                      .slice(0, 2)
-                      .toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">
-                    {user.name}
-                  </span>
-
-                  <span className="truncate text-xs text-muted-foreground">
-                    {user.email}
-                  </span>
-                </div>
-              </div>
-            </DropdownMenuLabel>
-
-            <DropdownMenuSeparator />
-
             <DropdownMenuGroup>
+              <DropdownMenuLabel className="p-0 font-normal">
+                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                  <Avatar className="size-8">
+                    {user.avatar && (
+                      <AvatarImage
+                        src={user.avatar}
+                        alt={user.name}
+                      />
+                    )}
+
+                    <AvatarFallback className="rounded-lg">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">
+                      {user.name}
+                    </span>
+
+                    <span className="truncate text-xs text-muted-foreground">
+                      {user.email}
+                    </span>
+                  </div>
+                </div>
+              </DropdownMenuLabel>
+
               <DropdownMenuItem
                 render={
                   <Link href="/profile">
@@ -147,7 +147,7 @@ export function NavUser({
             <DropdownMenuSeparator />
 
             <DropdownMenuItem
-              onClick={() => router.post("/logout")}
+              onClick={() => router.post('/logout')}
             >
               <LogOutIcon />
               Log out
