@@ -35,6 +35,8 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $tenant = tenant();
+
         return [
         ...parent::share($request),
 
@@ -49,6 +51,16 @@ class HandleInertiaRequests extends Middleware
                 ]
                 : null,
         ],
+
+        'tenant' => $tenant
+                ? [
+                    'id' => $tenant->id,
+                    'name' => $tenant->name,
+                    'logo' => $tenant->meta['image'] ?? null,
+                    'description' => $tenant->meta['description'] ?? null,
+                ]
+                : null,
+        
     ];
     }
 }

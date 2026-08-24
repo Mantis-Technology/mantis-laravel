@@ -1,7 +1,7 @@
-import * as React from "react"
+import * as React from 'react'
 
-import { NavMain } from "@/components/nav-main"
-import { NavUser } from "@/components/nav-user"
+import { NavMain } from '@/components/nav-main'
+import { NavUser } from '@/components/nav-user'
 import {
   Sidebar,
   SidebarContent,
@@ -10,79 +10,98 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { LayoutDashboardIcon, ListIcon, ChartBarIcon, FolderIcon, UsersIcon, CameraIcon, FileTextIcon, Settings2Icon, CircleHelpIcon, SearchIcon, DatabaseIcon, FileChartColumnIcon, FileIcon, CommandIcon } from "lucide-react"
+} from '@/components/ui/sidebar'
+
+import { usePage } from '@inertiajs/react'
+
+import {
+  ChartBarIcon,
+  FolderIcon,
+  LayoutDashboardIcon,
+  ListIcon,
+  UsersIcon,
+  CommandIcon,
+} from 'lucide-react'
+
+type Tenant = {
+  id: string
+  name: string
+  logo?: string | null
+  description?: string | null
+}
+
+type PageProps = {
+  tenant: Tenant | null
+}
 
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navMain: [
     {
-      title: "Dashboard",
-      url: "#",
-      icon: (
-        <LayoutDashboardIcon
-        />
-      ),
+      title: 'Dashboard',
+      url: '/dashboard',
+      icon: <LayoutDashboardIcon />,
     },
     {
-      title: "Lifecycle",
-      url: "#",
-      icon: (
-        <ListIcon
-        />
-      ),
+      title: 'Lifecycle',
+      url: '#',
+      icon: <ListIcon />,
     },
     {
-      title: "Analytics",
-      url: "#",
-      icon: (
-        <ChartBarIcon
-        />
-      ),
+      title: 'Analytics',
+      url: '#',
+      icon: <ChartBarIcon />,
     },
     {
-      title: "Projects",
-      url: "#",
-      icon: (
-        <FolderIcon
-        />
-      ),
+      title: 'Projects',
+      url: '#',
+      icon: <FolderIcon />,
     },
     {
-      title: "Team",
-      url: "#",
-      icon: (
-        <UsersIcon
-        />
-      ),
+      title: 'Team',
+      url: '#',
+      icon: <UsersIcon />,
     },
   ],
 }
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+
+export function AppSidebar(
+  props: React.ComponentProps<typeof Sidebar>,
+) {
+  const { tenant } = usePage<PageProps>().props
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
-              render={<a href="#" />}
+              className="h-auto w-full flex-col items-center justify-center gap-2 p-4!"
+              render={<a href="/" />}
             >
-              <CommandIcon className="size-5!" />
-              <span className="text-base font-semibold">Acme Inc.</span>
+              {tenant?.logo ? (
+                <img
+                  src="/tenant/logo"
+                  alt={tenant.name}
+                  className="w-full object-contain"
+                />
+              ) : (
+                <CommandIcon className="size-10!" />
+              )}
+
+              <span className="w-full truncate text-center text-base font-semibold">
+                {tenant?.name ?? 'Tenant'}
+              </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>
+
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   )

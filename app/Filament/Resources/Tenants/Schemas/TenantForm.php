@@ -32,6 +32,7 @@ class TenantForm
                 FileUpload::make('meta.image')
                     ->label('Logo')
                     ->image()
+                    ->disk('tenant_logos')
                     ->directory('tenants/logos')
                     ->maxSize(1024),
 

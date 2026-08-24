@@ -1,11 +1,11 @@
-import inertia from '@inertiajs/vite';
-import { wayfinder } from '@laravel/vite-plugin-wayfinder';
-import tailwindcss from '@tailwindcss/vite';
-import react from '@vitejs/plugin-react';
-import laravel from 'laravel-vite-plugin';
-import { bunny } from 'laravel-vite-plugin/fonts';
-import path from 'path';
-import { defineConfig } from 'vite';
+import inertia from '@inertiajs/vite'
+import { wayfinder } from '@laravel/vite-plugin-wayfinder'
+import tailwindcss from '@tailwindcss/vite'
+import react from '@vitejs/plugin-react'
+import laravel from 'laravel-vite-plugin'
+import { bunny } from 'laravel-vite-plugin/fonts'
+import path from 'path'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
     plugins: [
@@ -19,22 +19,28 @@ export default defineConfig({
                 }),
             ],
         }),
+
         inertia(),
+
         react({
             babel: {
                 plugins: ['babel-plugin-react-compiler'],
             },
         }),
+
         tailwindcss(),
+
         wayfinder({
             formVariants: true,
         }),
     ],
+
     resolve: {
         alias: {
             '@': path.resolve(import.meta.dirname, 'resources/js'),
         },
     },
+
     server: {
         host: '0.0.0.0',
         port: 5173,
@@ -52,9 +58,12 @@ export default defineConfig({
         hmr: {
             host: 'localhost',
             port: 5173,
+            clientPort: 5173,
         },
 
         watch: {
+            usePolling: true,
+            interval: 100,
             ignored: [
                 '**/.agents/**',
                 '**/.claude/**',
@@ -64,4 +73,4 @@ export default defineConfig({
             ],
         },
     },
-});
+})

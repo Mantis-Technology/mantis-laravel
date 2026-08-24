@@ -8,6 +8,8 @@ declare module '@inertiajs/core' {
             auth: {
                 user: User | null
             }
+            
+            tenant: Tenant | null
         }
     }
 }

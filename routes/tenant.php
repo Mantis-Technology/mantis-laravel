@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+use App\Http\Controllers\TenantLogoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,9 +28,11 @@ Route::middleware([
     Route::inertia('/', 'welcome')->name('home');
 
     Route::middleware('auth')->group(function () {
+        Route::get('/tenant/logo', TenantLogoController::class)
+            ->name('tenant.logo');
+
         Route::inertia('/dashboard', 'dashboard')->name('dashboard');
 
         Route::inertia('/profile', 'Profile/edit')->name('profile.edit');
     });
-
 });
