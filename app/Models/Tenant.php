@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\TenantStatus;
+
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Support\Str;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
@@ -14,6 +16,7 @@ use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
     'id',
     'name',
     'meta',
+    'status'
 ])]
 class Tenant extends BaseTenant implements TenantWithDatabase
 {
@@ -24,6 +27,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
             'id',
             'name',
             'meta',
+            'status'
         ];
     }
 
@@ -32,7 +36,39 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         return [
             'meta' => 'array',
             'data' => 'array',
+            'status' => TenantStatus::class,
         ];
+    }
+
+       public function activate(): void
+    {
+        if ($this->status === TenantStatus::Inactive) {
+            throw new \RuntimeException('An inactive tenant cannot be reactivated.');
+        }
+
+        if ($this->status === TenantStatus::Active) {
+            throw new \RuntimeException('Tenant is already active.');
+        }
+
+        $this->update(['status' => TenantStatus::Active]);
+    }
+
+    public function suspend(): void
+    {
+        if ($this->status !== TenantStatus::Active) {
+            throw new \RuntimeException('Only an active tenant can be suspended.');
+        }
+
+        $this->update(['status' => TenantStatus::Suspended]);
+    }
+
+    public function deactivate(): void
+    {
+        if ($this->status === TenantStatus::Inactive) {
+            throw new \RuntimeException('Tenant is already inactive.');
+        }
+
+        $this->update(['status' => TenantStatus::Inactive]);
     }
 
     protected static function booted(): void

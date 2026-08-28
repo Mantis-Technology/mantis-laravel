@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources\Tenants\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use App\Enums\TenantStatus;
+use Filament\Actions\Action; 
 
 class TenantsTable
 {
@@ -33,6 +33,13 @@ class TenantsTable
                     ->sortable()
                     ->copyable()
                     ->copyMessage('Subdominio copiado'),
+
+                TextColumn::make('status')
+                    ->label('Estado')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => $state->label())
+                    ->color(fn ($state) => $state->color()),
+
 
                 TextColumn::make('meta.description')
                     ->label('Descripción')
@@ -63,14 +70,36 @@ class TenantsTable
             ->filters([
                 //
             ])
-            ->recordActions([
+            
+                        ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+
+                Action::make('activate')
+                    ->label('Activar')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->visible(fn ($record) => $record->status !== TenantStatus::Active && $record->status !== TenantStatus::Inactive)
+                    ->action(fn ($record) => $record->activate()),
+
+                Action::make('suspend')
+                    ->label('Suspender')
+                    ->icon('heroicon-o-pause-circle')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->visible(fn ($record) => $record->status === TenantStatus::Active)
+                    ->action(fn ($record) => $record->suspend()),
+
+                Action::make('deactivate')
+                    ->label('Desactivar')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->visible(fn ($record) => $record->status !== TenantStatus::Inactive)
+                    ->action(fn ($record) => $record->deactivate()),
             ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+
+                        ->toolbarActions([]);
     }
 }
