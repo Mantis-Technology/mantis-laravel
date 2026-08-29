@@ -33,6 +33,12 @@ Route::middleware([
 
         Route::inertia('/dashboard', 'dashboard')->name('dashboard');
 
+        Route::group(['prefix' => 'parameterization', 'as' => 'parameterization.'], function () {
+            Route::inertia('/maintenance-categories', 'Parameterization/MaintenanceCategories/index')
+                ->name('maintenance-categories.index');
+        });
+
+
         Route::inertia('/profile', 'Profile/edit')->name('profile.edit');
     });
 });

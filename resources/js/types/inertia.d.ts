@@ -10,6 +10,8 @@ declare module '@inertiajs/core' {
             }
             
             tenant: Tenant | null
+
+            maintenance_categories: MaintenanceCategory[];
         }
     }
 }

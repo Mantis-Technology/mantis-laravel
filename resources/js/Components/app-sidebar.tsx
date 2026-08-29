@@ -6,20 +6,25 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from '@/components/ui/sidebar'
+
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 
 import { usePage } from '@inertiajs/react'
 
 import {
-  ChartBarIcon,
   FolderIcon,
   LayoutDashboardIcon,
   ListIcon,
-  UsersIcon,
+  ChevronRight,
   CommandIcon,
 } from 'lucide-react'
 
@@ -39,27 +44,15 @@ const data = {
     {
       title: 'Dashboard',
       url: '/dashboard',
-      icon: <LayoutDashboardIcon />,
+      icon: LayoutDashboardIcon,
     },
+  ],
+
+  parameterization: [
     {
-      title: 'Lifecycle',
-      url: '#',
-      icon: <ListIcon />,
-    },
-    {
-      title: 'Analytics',
-      url: '#',
-      icon: <ChartBarIcon />,
-    },
-    {
-      title: 'Projects',
-      url: '#',
-      icon: <FolderIcon />,
-    },
-    {
-      title: 'Team',
-      url: '#',
-      icon: <UsersIcon />,
+      title: 'Categorías de Mantenimiento',
+      url: '/parameterization/maintenance-categories',
+      icon: ListIcon,
     },
   ],
 }
@@ -98,6 +91,46 @@ export function AppSidebar(
 
       <SidebarContent>
         <NavMain items={data.navMain} />
+
+        <SidebarGroup>
+          <SidebarMenu>
+            <Collapsible
+              defaultOpen
+              className="group/collapsible"
+            >
+              <SidebarMenuItem>
+                <CollapsibleTrigger
+                  render={
+                    <SidebarMenuButton
+                      tooltip="Parametrización"
+                    />
+                  }
+                >
+                  <FolderIcon className="size-4" />
+
+                  <span>Parametrización</span>
+
+                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                </CollapsibleTrigger>
+
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    {data.parameterization.map((item) => (
+                      <SidebarMenuSubItem key={item.title}>
+                        <SidebarMenuSubButton
+                          render={<a href={item.url} />}
+                        >
+                          {item.icon && <item.icon />}
+                          <span>{item.title}</span>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </SidebarMenuItem>
+            </Collapsible>
+          </SidebarMenu>
+        </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter>

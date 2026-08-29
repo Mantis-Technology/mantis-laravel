@@ -11,7 +11,7 @@ import {
 type NavItem = {
     title: string
     url: string
-    icon: React.ReactNode
+    icon?: React.ElementType
 }
 
 export function NavMain({
@@ -34,7 +34,7 @@ export function NavMain({
                                     />
                                 }
                             >
-                                {item.icon}
+                                {item.icon && <item.icon />}
                                 <span>{item.title}</span>
                             </SidebarMenuButton>
                         </SidebarMenuItem>

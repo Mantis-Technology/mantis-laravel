@@ -39,6 +39,7 @@ export default defineConfig({
         alias: {
             '@': path.resolve(import.meta.dirname, 'resources/js'),
         },
+        dedupe: ['react', 'react-dom'],
     },
 
     server: {
