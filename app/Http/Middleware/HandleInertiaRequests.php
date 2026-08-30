@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\MaintenanceCategory;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -38,19 +39,26 @@ class HandleInertiaRequests extends Middleware
     {
         $tenant = tenant();
 
+        $user = $request->user();
+
+        $authUser = null;
+        if ($user instanceof User) {
+            $authUser = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'email' => $user->email,
+                'avatar' => $user->avatar ?? null,
+                'roles' => $user->getRoleNames()->all(),
+                'email_verified_at' => $user->email_verified_at,
+            ];
+        }
+
         return [
             ...parent::share($request),
 
             'auth' => [
-                'user' => $request->user()
-                    ? [
-                        'id' => $request->user()->id,
-                        'name' => $request->user()->name,
-                        'email' => $request->user()->email,
-                        'avatar' => $request->user()->avatar ?? null,
-                        'email_verified_at' => $request->user()->email_verified_at,
-                    ]
-                    : null,
+                'user' => $authUser,
             ],
 
             'tenant' => $tenant
@@ -62,16 +70,16 @@ class HandleInertiaRequests extends Middleware
                 ]
                 : null,
 
-            'maintenance_categories' => MaintenanceCategory::all()->map(function ($category) {
-                return [
-                    'id' => $category->id,
-                    'name' => $category->name,
-                    'description' => $category->description,
-                    'is_active' => $category->is_active,
-                    'created_at' => $category->created_at,
-                    'updated_at' => $category->updated_at,
-                ];
-            }),
+            'maintenance_categories' => MaintenanceCategory::all()->map(function (MaintenanceCategory $category): array {
+                    return [
+                        'id' => $category->id,
+                        'name' => $category->name,
+                        'description' => $category->description,
+                        'is_active' => $category->is_active,
+                        'created_at' => $category->created_at,
+                        'updated_at' => $category->updated_at,
+                    ];
+                }),
 
         ];
     }

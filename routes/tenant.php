@@ -69,6 +69,77 @@ Route::middleware([
             });
         });
 
+        Route::middleware('role:tenant_admin')->group(function () {
+            Route::prefix('users')
+                ->as('users.')
+                ->group(function () {
+                    Route::get('/', [UserController::class, 'index'])
+                        ->name('index');
+
+                    Route::get('/create', [UserController::class, 'create'])
+                        ->name('create');
+
+                    Route::post('/', [UserController::class, 'store'])
+                        ->name('store');
+
+                    Route::get('/{id}/edit', [UserController::class, 'edit'])
+                        ->name('edit');
+
+                    Route::put('/{id}', [UserController::class, 'update'])
+                        ->name('update');
+
+                    Route::delete('/{id}', [UserController::class, 'destroy'])
+                        ->name('destroy');
+
+                    Route::post('/{id}/restore', [UserController::class, 'restore'])
+                        ->name('restore');
+                });
+
+            Route::prefix('roles')
+                ->as('roles.')
+                ->group(function () {
+                    Route::get('/', [RoleController::class, 'index'])
+                        ->name('index');
+
+                    Route::get('/create', [RoleController::class, 'create'])
+                        ->name('create');
+
+                    Route::post('/', [RoleController::class, 'store'])
+                        ->name('store');
+
+                    Route::get('/{id}/edit', [RoleController::class, 'edit'])
+                        ->name('edit');
+
+                    Route::put('/{id}', [RoleController::class, 'update'])
+                        ->name('update');
+
+                    Route::delete('/{id}', [RoleController::class, 'destroy'])
+                        ->name('destroy');
+                });
+
+            Route::prefix('permissions')
+                ->as('permissions.')
+                ->group(function () {
+                    Route::get('/', [PermissionController::class, 'index'])
+                        ->name('index');
+
+                    Route::get('/create', [PermissionController::class, 'create'])
+                        ->name('create');
+
+                    Route::post('/', [PermissionController::class, 'store'])
+                        ->name('store');
+
+                    Route::get('/{id}/edit', [PermissionController::class, 'edit'])
+                        ->name('edit');
+
+                    Route::put('/{id}', [PermissionController::class, 'update'])
+                        ->name('update');
+
+                    Route::delete('/{id}', [PermissionController::class, 'destroy'])
+                        ->name('destroy');
+                });
+        });
+
         Route::inertia('/profile', 'Profile/edit')->name('profile.edit');
     });
 });
