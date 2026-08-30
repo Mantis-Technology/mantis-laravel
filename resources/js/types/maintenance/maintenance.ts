@@ -1,9 +1,11 @@
-export type MaintenanceCategory = {
+export interface MaintenanceCategory {
     id: number;
     name: string;
-    description?: string;
+    description: string | null;
     is_active: boolean;
     created_at: string;
     updated_at: string;
-    [key: string]: unknown; // This allows for additional properties...
-};
+    parent_id: number | null;
+
+    children: MaintenanceCategory[];
+}   

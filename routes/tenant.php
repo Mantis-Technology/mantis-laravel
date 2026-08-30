@@ -2,10 +2,14 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\parameterization\MaintenanceCategoryController;
+use App\Http\Controllers\permissions\PermissionController;
+use App\Http\Controllers\roles\RoleController;
+use App\Http\Controllers\TenantLogoController;
+use App\Http\Controllers\users\UserController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
-use App\Http\Controllers\TenantLogoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,11 +37,37 @@ Route::middleware([
 
         Route::inertia('/dashboard', 'dashboard')->name('dashboard');
 
-        Route::group(['prefix' => 'parameterization', 'as' => 'parameterization.'], function () {
-            Route::inertia('/maintenance-categories', 'Parameterization/MaintenanceCategories/index')
-                ->name('maintenance-categories.index');
-        });
+        Route::group([
+            'prefix' => 'parameterization',
+            'as' => 'parameterization.',
+        ], function () {
+            Route::group([
+                'prefix' => 'maintenance-categories',
+                'as' => 'maintenance-categories.',
+            ], function () {
+                Route::get('/', [MaintenanceCategoryController::class, 'index'])
+                    ->name('index');
 
+                Route::get('/create', [MaintenanceCategoryController::class, 'create'])
+                    ->name('create');
+
+                Route::post('/', [MaintenanceCategoryController::class, 'store'])
+                    ->name('store');
+
+                Route::get('/{id}/edit', [MaintenanceCategoryController::class, 'edit'])
+                    ->name('edit');
+
+                Route::put('/{id}', [MaintenanceCategoryController::class, 'update'])
+                    ->name('update');
+
+                Route::delete('/{id}', [MaintenanceCategoryController::class, 'destroy'])
+                    ->name('destroy');
+
+                Route::patch('/{id}/active', [MaintenanceCategoryController::class, 'toggleActive'])
+                    ->name('toggle-active')
+                    ->middleware('role:maintenance_chief|tenant_admin');
+            });
+        });
 
         Route::inertia('/profile', 'Profile/edit')->name('profile.edit');
     });
