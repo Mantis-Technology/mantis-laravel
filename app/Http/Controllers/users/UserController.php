@@ -81,8 +81,8 @@ class UserController extends Controller
             'password' => $validated['password'],
         ]);
 
-        $user->syncRoles($validated['roles'] ?? []);
-        $user->syncPermissions($validated['permissions'] ?? []);
+        $user->syncRoles(array_map('intval', $validated['roles'] ?? []));
+        $user->syncPermissions(array_map('intval', $validated['permissions'] ?? []));
 
         return redirect()
             ->route('users.index')
@@ -136,7 +136,7 @@ class UserController extends Controller
         ]);
 
         $isSelf = $request->user()->id === $user->id;
-        $roles = $validated['roles'] ?? [];
+        $roles = array_map('intval', $validated['roles'] ?? []);
 
         if ($isSelf && ! in_array($this->adminRoleId(), $roles)) {
             return back()->withErrors([
@@ -157,7 +157,7 @@ class UserController extends Controller
         $user->save();
 
         $user->syncRoles($roles);
-        $user->syncPermissions($validated['permissions'] ?? []);
+        $user->syncPermissions(array_map('intval', $validated['permissions'] ?? []));
 
         return redirect()
             ->route('users.index')

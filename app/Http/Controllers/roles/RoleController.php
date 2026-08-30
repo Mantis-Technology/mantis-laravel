@@ -67,7 +67,7 @@ class RoleController extends Controller
             'guard_name' => 'web',
         ]);
 
-        $role->syncPermissions($validated['permissions'] ?? []);
+        $role->syncPermissions(array_map('intval', $validated['permissions'] ?? []));
 
         return redirect()
             ->route('roles.index')
@@ -108,7 +108,7 @@ class RoleController extends Controller
         ]);
 
         $role->update(['name' => $validated['name']]);
-        $role->syncPermissions($validated['permissions'] ?? []);
+        $role->syncPermissions(array_map('intval', $validated['permissions'] ?? []));
 
         return redirect()
             ->route('roles.index')
