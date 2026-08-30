@@ -61,6 +61,11 @@ class HandleInertiaRequests extends Middleware
                 'user' => $authUser,
             ],
 
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
+            ],
+
             'tenant' => $tenant
                 ? [
                     'id' => $tenant->id,
@@ -70,7 +75,8 @@ class HandleInertiaRequests extends Middleware
                 ]
                 : null,
 
-            'maintenance_categories' => MaintenanceCategory::all()->map(function (MaintenanceCategory $category): array {
+            'maintenance_categories' => $tenant
+                ? MaintenanceCategory::all()->map(function (MaintenanceCategory $category): array {
                     return [
                         'id' => $category->id,
                         'name' => $category->name,
@@ -79,7 +85,8 @@ class HandleInertiaRequests extends Middleware
                         'created_at' => $category->created_at,
                         'updated_at' => $category->updated_at,
                     ];
-                }),
+                })
+                : [],
 
         ];
     }
