@@ -186,3 +186,55 @@ Use Wayfinder to generate TypeScript functions for Laravel routes. Import from `
 - IMPORTANT: Activate `inertia-react-development` when working with Inertia React client-side patterns.
 
 </laravel-boost-guidelines>
+
+# Mantis — Application Blueprint
+
+Multi-tenant Laravel 13 app (PHP 8.5, Inertia v3 + React 19, Filament v5, Tailwind v4). Project-specific context not covered by the generic guidelines above.
+
+## Multi-tenancy (stancl/tenancy, DB-per-tenant)
+
+This is the single most important thing to get right — nearly everything lives under tenancy.
+
+- There are TWO apps in one repo:
+  - **Central** app, served only on `central_domains` (`localhost`, `127.0.0.1`, see `config/tenancy.php`). Data lives in the central DB. Models: `Admin`, `Tenant`, `Domain`. Hosts the Filament panel.
+  - **Tenant** app, served on `{tenant-slug}.localhost` via domain-based tenancy. Tenant routes live in **`routes/tenant.php`** (`InitializeTenancyByDomain` + `PreventAccessFromCentralDomains` middleware), NOT `routes/web.php`. Models: `User`, `MaintenanceCategory`.
+- `routes/web.php` only maps the central domain home page. New customer-facing routes go in `routes/tenant.php`.
+- **Migrations split by database:** `php artisan migrate` only runs CENTRAL migrations. Per-tenant migrations live in **`database/migrations/tenant/`** and run via **`php artisan tenants:migrate`**. Put new per-tenant tables there.
+- Tenant DBs are auto-created + migrated synchronously on tenant creation (`TenancyServiceProvider` event pipelines). Creating a `Tenant` also auto-creates its `{slug}.localhost` domain; the tenant id is derived from the name slug and renames cascade to the domain on update.
+- PostgreSQL (prod) uses schema-based tenancy (`PostgreSQLSchemaManager`); local dev uses SQLite.
+
+## Auth: two independent surfaces
+
+- **Tenant app auth = Fortify** (guard `web`, `User` model with Spatie `HasRoles`). Fortify renders Inertia pages (`Auth/login`, `Auth/register`, `Auth/forgot-password`, `Auth/reset-password`, `Auth/verify-email`); 2FA and passkeys are enabled. See `app/Providers/FortifyServiceProvider.php` and `app/Actions/Fortify/`.
+- **Central admin = Filament v5 panel at `/admin`** (`AdminPanelProvider`, guard `admin`, `Admin` model) — currently exposes the `Tenant` resource for provisioning tenants (activate/suspend/deactivate via `Tenant` model methods). Never authenticate or scope a `User` against the central DB or an `Admin` against tenant data.
+- Roles/permissions tables are per-tenant (`database/migrations/tenant/..._permission_tables.php`).
+
+## Verification commands
+
+- `composer dev` — runs `php artisan serve` + queue listener + Vite concurrently (container uses polling watching).
+- `composer test` — full gate: `pint --test` → `phpstan analyse` → `php artisan test`. May be slow; use `composer ci:check` for the same on CI.
+- Focused: `php artisan test --compact --filter=Name`, `npm run types:check` (tsc), `npm run lint:check` (eslint), `npm run format:check` (prettier), `vendor/bin/pint --dirty` for PHP style only.
+- CI (`.github/workflows/tests.yml`): PHP 8.5 + Node 22, runs `composer setup` then `composer ci:check`.
+- PHPStan runs at **level 7** (larastan) over `app/`, `config/`, `database/`, `routes/`.
+
+## Frontend gotchas
+
+- **Wayfinder route helpers are NOT committed.** `@laravel/vite-plugin-wayfinder` generates `resources/js/actions/`, `resources/js/routes/`, `resources/js/wayfinder/` (all gitignored) whenever Vite runs (`npm run dev` or `npm run build`). After adding/changing Laravel routes, regenerate them before relying on `@/actions` / `@/routes` imports; `php artisan route:list` alone won't refresh them. `formVariants: true` is enabled.
+- React **Compiler** is enabled (babel plugin in `vite.config.ts`) — follow its rules (no manual memo unless needed).
+- Tailwind v4 (CSS-first) with shadcn/ui primitives from `resources/js/components` (base-ui, `components.json`); prefill fields with `data-slot` attributes.
+- `HandleInertiaRequests` shares `auth.user`, `tenant`, and **all `maintenance_categories`** as global props on every tenant request — be mindful of the eager-loaded query; don't duplicate it.
+
+## Code conventions
+
+- Models use PHP 8 attribute-based fillable/hidden: `#[Fillable(['name', 'email', 'password'])]` / `#[Hidden(['password', ...])]` instead of `$fillable` / `$hidden` properties (see `app/Models/*`).
+- `declare(strict_types=1)` is used in some app/config/routes files — match the sibling file.
+- Domain request validation: this project uses inline validation in controllers (e.g. `MaintenanceCategoryController`) rather than FormRequest classes — follow that unless you add one deliberately.
+- `app/Actions/Fortify/` holds registration/profile actions; enums live in `app/Enums/` (UI strings are Spanish).
+
+## Skills
+
+Activate the matching local skill (`.claude/skills` / `.agents/skills`) when working in its domain: `fortify-development`, `inertia-react-development`, `wayfinder-development`, `pest-testing`, `laravel-best-practices`, `tailwindcss-development`.
+
+## Rules
+
+Before planning or editing, check `.ai/rules/` (`index.md` maps globs → rule files, plus `.ai/rules/boost/`) for committed, area-specific rules, and use Boost `record-rule` to persist new settled decisions there.
