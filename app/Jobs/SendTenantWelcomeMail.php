@@ -54,7 +54,7 @@ class SendTenantWelcomeMail
             loginUrl: $scheme.'://'.$domain.$port.'/login',
             username: DatabaseSeeder::DEFAULT_ADMIN_USERNAME,
             password: DatabaseSeeder::DEFAULT_ADMIN_PASSWORD,
-            requiresActivation: $this->tenant->getAttribute('status') !== TenantStatus::Active->value,
+            requiresActivation: $this->tenant->getAttribute('status') !== TenantStatus::Active,
         ));
     }
 }
