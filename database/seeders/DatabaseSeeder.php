@@ -13,6 +13,20 @@ use Spatie\Permission\PermissionRegistrar;
 class DatabaseSeeder extends Seeder
 {
     /**
+     * Default credentials of the automatic tenant administrator.
+     *
+     * @var string
+     */
+    public const DEFAULT_ADMIN_USERNAME = 'admin';
+
+    /**
+     * Default credentials of the automatic tenant administrator.
+     *
+     * @var string
+     */
+    public const DEFAULT_ADMIN_PASSWORD = 'admin';
+
+    /**
      * Role name => permissions granted to it.
      *
      * @var array<string, list<string>>
@@ -168,7 +182,7 @@ class DatabaseSeeder extends Seeder
             return;
         }
 
-        $admin = User::withTrashed()->firstOrNew(['username' => 'admin']);
+        $admin = User::withTrashed()->firstOrNew(['username' => self::DEFAULT_ADMIN_USERNAME]);
 
         $admin->fill([
             'name' => 'Administrador',
@@ -176,7 +190,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         if (! $admin->exists) {
-            $admin->password = Hash::make('admin');
+            $admin->password = Hash::make(self::DEFAULT_ADMIN_PASSWORD);
         }
 
         $admin->save();

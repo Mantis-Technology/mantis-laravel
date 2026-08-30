@@ -189,6 +189,22 @@ export default function Access({ adminUrl }: { adminUrl?: string }) {
                         );
                     })}
                 </div>
+
+                <div className="mt-12 flex items-center gap-4">
+                    <div className="h-px flex-1 bg-[#333535]" />
+                    <p className="font-mono text-[12px] tracking-[0.05em] text-[#c0caaf] uppercase">
+                        ¿Aún no es cliente?
+                    </p>
+                    <div className="h-px flex-1 bg-[#333535]" />
+                </div>
+
+                <Link
+                    href="/register/company"
+                    className="mt-6 inline-flex items-center gap-2 border border-[#9cfb2b] px-6 py-3 font-mono text-[14px] tracking-[0.05em] text-[#9cfb2b] uppercase transition-colors hover:bg-[#9cfb2b] hover:text-[#191919]"
+                >
+                    Registrar mi empresa
+                    <span aria-hidden="true">→</span>
+                </Link>
             </main>
 
             <footer className="border-t border-[#333535] bg-[#0c0f0f]">

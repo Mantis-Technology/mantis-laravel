@@ -40,6 +40,8 @@ createInertiaApp({
             name !== 'welcome' &&
             name !== 'access' &&
             name !== 'company-portal' &&
+            name !== 'tenant-register' &&
+            name !== 'tenant-register-success' &&
             !name.startsWith('Auth/')
         ) {
             Page.layout ??= (page: ReactNode) => <AppLayout>{page}</AppLayout>;
