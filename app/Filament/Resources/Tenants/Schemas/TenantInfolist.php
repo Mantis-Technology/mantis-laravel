@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Filament\Resources\Tenants\Schemas;
 
 use Filament\Infolists\Components\ImageEntry;
@@ -7,7 +9,6 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\TextSize;
-use Illuminate\Contracts\Support\Htmlable;
 
 class TenantInfolist
 {
@@ -34,6 +35,50 @@ class TenantInfolist
                             ->label('Descripción')
                             ->placeholder('Sin descripción')
                             ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+
+                Section::make('Datos fiscales y contacto')
+                    ->schema([
+                        TextEntry::make('tax_id')
+                            ->label('NIF / CIF')
+                            ->placeholder('-'),
+
+                        TextEntry::make('contact_name')
+                            ->label('Persona de contacto')
+                            ->placeholder('-'),
+
+                        TextEntry::make('contact_email')
+                            ->label('Email de contacto')
+                            ->placeholder('-'),
+
+                        TextEntry::make('phone')
+                            ->label('Teléfono')
+                            ->placeholder('-'),
+                    ])
+                    ->columns(2),
+
+                Section::make('Domicilio')
+                    ->schema([
+                        TextEntry::make('address')
+                            ->label('Dirección')
+                            ->placeholder('-'),
+
+                        TextEntry::make('city')
+                            ->label('Ciudad')
+                            ->placeholder('-'),
+
+                        TextEntry::make('province')
+                            ->label('Provincia')
+                            ->placeholder('-'),
+
+                        TextEntry::make('postal_code')
+                            ->label('Código postal')
+                            ->placeholder('-'),
+
+                        TextEntry::make('country')
+                            ->label('País')
+                            ->placeholder('-'),
                     ])
                     ->columns(2),
 
