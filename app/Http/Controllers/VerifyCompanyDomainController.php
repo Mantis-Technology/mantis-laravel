@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Enums\TenantStatus;
-use App\Models\Tenant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Stancl\Tenancy\Database\Models\Domain;
+use Illuminate\Support\Facades\DB;
 
 class VerifyCompanyDomainController extends Controller
 {
@@ -23,7 +22,10 @@ class VerifyCompanyDomainController extends Controller
             return response()->json(['available' => false]);
         }
 
-        $domain = Domain::query()
+        $connection = (string) config('tenancy.database.central_connection');
+
+        $domain = DB::connection($connection)
+            ->table('domains')
             ->where('domain', "$slug.".config('tenancy.central_domains')[0])
             ->first();
 
@@ -31,12 +33,14 @@ class VerifyCompanyDomainController extends Controller
             return response()->json(['available' => false]);
         }
 
-        $tenant = Tenant::query()->find($domain->tenant_id);
+        $status = DB::connection($connection)
+            ->table('tenants')
+            ->where('id', $domain->tenant_id)
+            ->value('status');
 
-        $available = $tenant !== null
-            && $tenant->status === TenantStatus::Active;
-
-        return response()->json(['available' => $available]);
+        return response()->json([
+            'available' => $status === TenantStatus::Active->value,
+        ]);
     }
 
     private function isValidSlug(string $slug): bool

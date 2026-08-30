@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Enums\TenantStatus;
-
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Support\Str;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
@@ -11,23 +10,25 @@ use Stancl\Tenancy\Database\Concerns\HasDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
 use Stancl\Tenancy\Database\Models\Domain;
 use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
+use Stancl\Tenancy\Exceptions\DomainOccupiedByOtherTenantException;
 
 #[Fillable([
     'id',
     'name',
     'meta',
-    'status'
+    'status',
 ])]
 class Tenant extends BaseTenant implements TenantWithDatabase
 {
     use HasDatabase, HasDomains;
+
     public static function getCustomColumns(): array
     {
         return [
             'id',
             'name',
             'meta',
-            'status'
+            'status',
         ];
     }
 
@@ -40,7 +41,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         ];
     }
 
-       public function activate(): void
+    public function activate(): void
     {
         if ($this->status === TenantStatus::Inactive) {
             throw new \RuntimeException('An inactive tenant cannot be reactivated.');
@@ -77,6 +78,10 @@ class Tenant extends BaseTenant implements TenantWithDatabase
             if (blank($tenant->id) && filled($tenant->name)) {
                 $tenant->id = Str::slug($tenant->name);
             }
+
+            if (blank($tenant->status)) {
+                $tenant->status = TenantStatus::Pending->value;
+            }
         });
 
         static::created(function (Tenant $tenant) {
@@ -98,7 +103,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
                 ->exists();
 
             if ($occupied) {
-                throw new \Stancl\Tenancy\Exceptions\DomainOccupiedByOtherTenantException(
+                throw new DomainOccupiedByOtherTenantException(
                     $domain
                 );
             }
