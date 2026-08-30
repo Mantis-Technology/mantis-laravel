@@ -1,5 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react'
-import { LayoutDashboard, LogIn, LogOut, UserPlus } from 'lucide-react'
+import { LayoutDashboard, LogIn, LogOut } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -77,15 +77,6 @@ export default function Welcome() {
                                             </Link>
                                         }
                                     />
-
-                                    <Button
-                                        render={
-                                            <Link href="/register">
-                                                <UserPlus />
-                                                Register
-                                            </Link>
-                                        }
-                                    />
                                 </>
                             )}
                         </nav>
@@ -105,7 +96,7 @@ export default function Welcome() {
                                 <CardDescription className="text-base">
                                     {auth.user
                                         ? 'You are signed in and ready to continue.'
-                                        : 'Sign in to your account or create a new one to get started.'}
+                                        : 'Sign in to your account to get started.'}
                                 </CardDescription>
                             </CardHeader>
 
@@ -140,17 +131,6 @@ export default function Welcome() {
                                                 <Link href="/login">
                                                     <LogIn />
                                                     Sign in
-                                                </Link>
-                                            }
-                                        />
-
-                                        <Button
-                                            size="lg"
-                                            variant="outline"
-                                            render={
-                                                <Link href="/register">
-                                                    <UserPlus />
-                                                    Create account
                                                 </Link>
                                             }
                                         />

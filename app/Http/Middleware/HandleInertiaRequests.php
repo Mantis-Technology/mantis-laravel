@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\MaintenanceCategory;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -37,22 +39,34 @@ class HandleInertiaRequests extends Middleware
     {
         $tenant = tenant();
 
+        $user = $request->user();
+
+        $authUser = null;
+        if ($user instanceof User) {
+            $authUser = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'email' => $user->email,
+                'avatar' => $user->avatar ?? null,
+                'roles' => $user->getRoleNames()->all(),
+                'email_verified_at' => $user->email_verified_at,
+            ];
+        }
+
         return [
-        ...parent::share($request),
+            ...parent::share($request),
 
-        'auth' => [
-            'user' => $request->user()
-                ? [
-                    'id' => $request->user()->id,
-                    'name' => $request->user()->name,
-                    'email' => $request->user()->email,
-                    'avatar' => $request->user()->avatar ?? null,
-                    'email_verified_at' => $request->user()->email_verified_at,
-                ]
-                : null,
-        ],
+            'auth' => [
+                'user' => $authUser,
+            ],
 
-        'tenant' => $tenant
+            'flash' => [
+                'success' => $request->session()->get('success'),
+                'error' => $request->session()->get('error'),
+            ],
+
+            'tenant' => $tenant
                 ? [
                     'id' => $tenant->id,
                     'name' => $tenant->name,
@@ -60,7 +74,20 @@ class HandleInertiaRequests extends Middleware
                     'description' => $tenant->meta['description'] ?? null,
                 ]
                 : null,
-        
-    ];
+
+            'maintenance_categories' => $tenant
+                ? MaintenanceCategory::all()->map(function (MaintenanceCategory $category): array {
+                    return [
+                        'id' => $category->id,
+                        'name' => $category->name,
+                        'description' => $category->description,
+                        'is_active' => $category->is_active,
+                        'created_at' => $category->created_at,
+                        'updated_at' => $category->updated_at,
+                    ];
+                })
+                : [],
+
+        ];
     }
 }

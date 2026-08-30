@@ -1,6 +1,8 @@
 <?php
 
 use Laravel\Fortify\Features;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 return [
 
@@ -8,7 +10,7 @@ return [
 
     'passwords' => 'users',
 
-    'username' => 'email',
+    'username' => 'username',
 
     'email' => 'email',
 
@@ -22,8 +24,8 @@ return [
 
     'middleware' => [
         'web',
-        \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class,
-        \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+        InitializeTenancyByDomain::class,
+        PreventAccessFromCentralDomains::class,
     ],
 
     'limiters' => [
@@ -41,7 +43,6 @@ return [
     ],
 
     'features' => [
-        Features::registration(),
         Features::resetPasswords(),
         Features::emailVerification(),
         Features::updateProfileInformation(),

@@ -32,8 +32,10 @@ class TenantForm
                 FileUpload::make('meta.image')
                     ->label('Logo')
                     ->image()
+                    ->disk('local')
                     ->directory('tenants/logos')
-                    ->maxSize(10024),
+                    ->maxSize(10024)
+                    ->required(),
 
                 Textarea::make('meta.description')
                     ->label('Descripción')

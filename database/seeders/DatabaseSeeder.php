@@ -2,43 +2,24 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Enums\Role;
+use App\Models\User;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role as SpatieRole;
+use Spatie\Permission\PermissionRegistrar;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
-     * Seed the application's database.
+     * Role name => permissions granted to it.
+     *
+     * @var array<string, list<string>>
      */
-    public function run(): void
-    {
-
+    private const ROLES = [
         // Tenant Administrator
-        /**
-         * Responsable de administrar la configuración y los recursos
-         * generales de una empresa dentro de MANTIS.
-         *
-         * Este rol no participa directamente en la ejecución de
-         * mantenimientos, sino que gestiona usuarios, roles, permisos
-         * y configuración del tenant.
-         *
-         * Permisos:
-         * - Consultar y administrar usuarios.
-         * - Asignar y revocar roles.
-         * - Gestionar permisos disponibles dentro del tenant.
-         * - Consultar y modificar la configuración de la empresa.
-         * - Gestionar sedes, áreas y ubicaciones.
-         * - Consultar información administrativa del tenant.
-         */
-
-        $tenantAdminRole = Role::create([
-            'name' => 'tenant_admin',
-        ]);
-
-        $tenantAdminRole->givePermissionTo([
+        'tenant_admin' => [
             // Usuarios
             'query:view_users',
             'action:create_users',
@@ -65,29 +46,10 @@ class DatabaseSeeder extends Seeder
             'action:create_locations',
             'action:update_locations',
             'action:deactivate_locations',
-        ]);
+        ],
 
-        /*
-        |--------------------------------------------------------------------------
-        | Maintenance Chief
-        |--------------------------------------------------------------------------
-        |
-        | Responsable de supervisar y coordinar las actividades de mantenimiento
-        | dentro de la empresa. Gestiona la asignación de casos, planificación,
-        | seguimiento y supervisión de mantenimientos, además del análisis
-        | de resultados y cumplimiento de niveles de servicio.
-        |
-        | La administración de roles y permisos no pertenece a este rol,
-        | ya que corresponde a las responsabilidades de administración
-        | de usuarios y autorización del sistema.
-        |
-        */
-
-        $maintenanceChiefRole = Role::create([
-            'name' => 'maintenance_chief',
-        ]);
-
-        $maintenanceChiefRole->givePermissionTo([
+        // Maintenance Chief
+        'maintenance_chief' => [
             // Casos de mantenimiento
             'query:view_maintenance_cases',
             'action:assign_maintenance_cases',
@@ -114,25 +76,10 @@ class DatabaseSeeder extends Seeder
             // Recomendaciones predictivas
             'query:view_predictive_recommendations',
             'action:approve_predictive_recommendations',
-        ]);
+        ],
 
-        /*
-        |--------------------------------------------------------------------------
-        | Technician
-        |--------------------------------------------------------------------------
-        |
-        | Responsable de atender y ejecutar los casos de mantenimiento que
-        | le sean asignados. Puede actualizar el progreso de sus casos,
-        | registrar trabajo realizado, documentar diagnósticos y soluciones,
-        | y reportar incidencias encontradas durante la intervención.
-        |
-        */
-
-        $technicianRole = Role::create([
-            'name' => 'technician',
-        ]);
-
-        $technicianRole->givePermissionTo([
+        // Technician
+        'technician' => [
             // Casos asignados
             'query:view_assigned_maintenance_cases',
             'action:update_assigned_maintenance_case',
@@ -154,25 +101,10 @@ class DatabaseSeeder extends Seeder
 
             // Historial
             'query:view_asset_maintenance_history',
-        ]);
+        ],
 
-        /*
-        |--------------------------------------------------------------------------
-        | Operator
-        |--------------------------------------------------------------------------
-        |
-        | Responsable de operar los equipos y comunicar anomalías observadas
-        | durante la operación. Su interacción principal con MANTIS consiste
-        | en identificar el activo y generar reportes de fallas o problemas
-        | de seguridad.
-        |
-        */
-
-        $operatorRole = Role::create([
-            'name' => 'operator',
-        ]);
-
-        $operatorRole->givePermissionTo([
+        // Operator
+        'operator' => [
             // Consulta básica de activos
             'query:view_assigned_assets',
 
@@ -185,6 +117,70 @@ class DatabaseSeeder extends Seeder
 
             // Consulta de reportes propios
             'query:view_own_reports',
+        ],
+    ];
+
+    /**
+     * Seed the application's database.
+     *
+     * Roles, permissions and the default administrator are tenant data: they
+     * are seeded automatically when a tenant is created, through the
+     * `SeedDatabase` job of the tenant-creation pipeline. This seeder
+     * therefore only does work in an initialized tenant context.
+     */
+    public function run(): void
+    {
+        if (! tenancy()->initialized) {
+            return;
+        }
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        foreach (self::ROLES as $roleName => $permissions) {
+            $role = SpatieRole::query()->firstOrCreate([
+                'name' => $roleName,
+                'guard_name' => 'web',
+            ]);
+
+            foreach ($permissions as $permission) {
+                Permission::query()->firstOrCreate([
+                    'name' => $permission,
+                    'guard_name' => 'web',
+                ]);
+            }
+
+            $role->syncPermissions($permissions);
+        }
+
+        $this->createDefaultAdministrator();
+    }
+
+    /**
+     * Ensures the default tenant administrator (username: `admin`,
+     * password: `admin`) exists. The password is only set on first creation,
+     * so an already-created administrator keeps the credentials chosen later.
+     */
+    private function createDefaultAdministrator(): void
+    {
+        $tenant = tenant();
+
+        if (! $tenant) {
+            return;
+        }
+
+        $admin = User::withTrashed()->firstOrNew(['username' => 'admin']);
+
+        $admin->fill([
+            'name' => 'Administrador',
+            'email' => $admin->email ?? "admin@{$tenant->id}.localhost",
         ]);
+
+        if (! $admin->exists) {
+            $admin->password = Hash::make('admin');
+        }
+
+        $admin->save();
+
+        $admin->syncRoles([Role::TENANT_ADMINISTRATOR->value]);
     }
 }
