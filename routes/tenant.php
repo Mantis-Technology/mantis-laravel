@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\AccessPortalController;
+use App\Http\Controllers\CompanyPortalController;
 use App\Http\Controllers\parameterization\MaintenanceCategoryController;
 use App\Http\Controllers\permissions\PermissionController;
 use App\Http\Controllers\roles\RoleController;
@@ -30,6 +32,10 @@ Route::middleware([
 ])->group(function () {
 
     Route::inertia('/', 'welcome')->name('home');
+
+    Route::get('/access', AccessPortalController::class)->name('access');
+
+    Route::get('/portal', CompanyPortalController::class)->name('portal');
 
     Route::middleware('auth')->group(function () {
         Route::get('/tenant/logo', TenantLogoController::class)
