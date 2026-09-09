@@ -14,16 +14,7 @@ return new class extends Migration
         Schema::create('assets', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique();
-            $table->string('model')->nullable();
-            
-            $table->string('serial_number')->nullable();
-            $table->string('image_url')->nullable();
-            
-            $table->bigInteger('criteria_brand_id')->nullable();
-            $table->bigInteger('criteria_category_id')->nullable();
-            $table->bigInteger('criteria_subcategory_id')->nullable();
-            $table->bigInteger('criteria_provider_id')->nullable();
-
+            $table->boolean('is_active')->default(true);
             
             $table->timestamps();
         });
