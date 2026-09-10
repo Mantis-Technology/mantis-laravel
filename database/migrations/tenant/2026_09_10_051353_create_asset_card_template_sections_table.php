@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('assets', function (Blueprint $table) {
+        Schema::create('asset_card_template_sections', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique();
-            $table->boolean('is_active')->default(true);
-            
             $table->timestamps();
         });
     }
@@ -25,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('assets');
+        Schema::dropIfExists('asset_card_template_sections');
     }
 };
