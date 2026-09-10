@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('asset_card_templates', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('description')->nullable();
+        Schema::create('card_template_version', function (Blueprint $table) {
+            
+            $table->foreignId('asset_card_template_id')->constrained('asset_card_templates')->onDelete('cascade');
             $table->integer('version')->default(1);
             $table->timestamps();
+
+            $table->primary(['asset_card_template_id', 'version']);
         });
     }
 
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('asset_card_templates');
+        Schema::dropIfExists('card_template_version');
     }
 };
