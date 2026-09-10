@@ -15,12 +15,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class AssetCard extends Model
 {
 
-    // Relationships
-    public function template(): BelongsTo
+    public function templateVersion(): CardTemplateVersion
     {
-        return $this->belongsTo(
-            AssetCardTemplate::class,
-            'asset_card_template_id'
-        );
+        return CardTemplateVersion::query()
+            ->where('asset_card_template_id', $this->asset_card_template_id)
+            ->where('version', $this->version)
+            ->firstOrFail();
     }
+    
 }
