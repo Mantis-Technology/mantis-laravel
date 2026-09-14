@@ -235,38 +235,42 @@ export function BuilderCanvas() {
             ref={containerRef}
             className="relative min-w-0 flex-1 overflow-auto rounded-xl border bg-muted/20"
         >
-            <ReactFlow
-                nodes={nodes}
-                edges={[]}
-                nodeTypes={nodeTypes}
-                style={{ height: flowHeight }}
-                onNodesChange={handleNodesChange}
-                onNodeDragStop={handleNodeDragStop}
-                onNodeClick={(_event, node) => {
-                    if (node.type === 'field') {
-                        selectField(node.data.sectionId, node.data.fieldIndex);
+            <div style={{ height: flowHeight }}>
+                <ReactFlow
+                    nodes={nodes}
+                    edges={[]}
+                    nodeTypes={nodeTypes}
+                    onNodesChange={handleNodesChange}
+                    onNodeDragStop={handleNodeDragStop}
+                    onNodeClick={(_event, node) => {
+                        if (node.type === 'field') {
+                            selectField(
+                                node.data.sectionId,
+                                node.data.fieldIndex,
+                            );
 
-                        return;
-                    }
+                            return;
+                        }
 
-                    selectSection(node.id);
-                }}
-                onPaneClick={clearSelection}
-                nodesConnectable={false}
-                panOnDrag={false}
-                panOnScroll={false}
-                autoPanOnNodeDrag={false}
-                autoPanOnSelection={false}
-                preventScrolling={false}
-                zoomOnScroll={false}
-                zoomOnPinch={false}
-                zoomOnDoubleClick={false}
-                minZoom={1}
-                maxZoom={1}
-                fitView={false}
-            >
-                <Background />
-            </ReactFlow>
+                        selectSection(node.id);
+                    }}
+                    onPaneClick={clearSelection}
+                    nodesConnectable={false}
+                    panOnDrag={false}
+                    panOnScroll={false}
+                    autoPanOnNodeDrag={false}
+                    autoPanOnSelection={false}
+                    preventScrolling={false}
+                    zoomOnScroll={false}
+                    zoomOnPinch={false}
+                    zoomOnDoubleClick={false}
+                    minZoom={1}
+                    maxZoom={1}
+                    fitView={false}
+                >
+                    <Background />
+                </ReactFlow>
+            </div>
 
             {sections.length === 0 && (
                 <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center p-6">

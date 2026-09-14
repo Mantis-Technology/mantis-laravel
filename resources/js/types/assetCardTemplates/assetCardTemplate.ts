@@ -157,6 +157,77 @@ export function fieldTypeLabel(type: TemplateFieldType): string {
     return fieldTypeMeta(type).label;
 }
 
+export type MimeTypeOption = {
+    value: string;
+    label: string;
+};
+
+export type MimeTypeGroup = {
+    label: string;
+    options: MimeTypeOption[];
+};
+
+export const MIME_TYPE_GROUPS: MimeTypeGroup[] = [
+    {
+        label: 'Imágenes',
+        options: [
+            { value: 'image/jpeg', label: 'Imagen JPG' },
+            { value: 'image/png', label: 'Imagen PNG' },
+            { value: 'image/gif', label: 'Imagen GIF' },
+            { value: 'image/webp', label: 'Imagen WEBP' },
+            { value: 'image/svg+xml', label: 'Imagen SVG' },
+        ],
+    },
+    {
+        label: 'Documentos',
+        options: [
+            { value: 'application/pdf', label: 'Documento PDF' },
+            { value: 'application/msword', label: 'Word (DOC)' },
+            {
+                value: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                label: 'Word (DOCX)',
+            },
+            { value: 'text/plain', label: 'Texto plano' },
+            { value: 'text/csv', label: 'CSV' },
+        ],
+    },
+    {
+        label: 'Hojas de cálculo',
+        options: [
+            { value: 'application/vnd.ms-excel', label: 'Excel (XLS)' },
+            {
+                value: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                label: 'Excel (XLSX)',
+            },
+        ],
+    },
+    {
+        label: 'Otros',
+        options: [
+            { value: 'application/zip', label: 'Archivo ZIP' },
+            { value: 'video/mp4', label: 'Video MP4' },
+            { value: 'audio/mpeg', label: 'Audio MP3' },
+        ],
+    },
+];
+
+export function mimeTypeGroupsFor(values: string[]): MimeTypeGroup[] {
+    const known = new Set(
+        MIME_TYPE_GROUPS.flatMap((group) =>
+            group.options.map((option) => option.value),
+        ),
+    );
+    const custom = values
+        .filter((value) => value !== '' && !known.has(value))
+        .map((value) => ({ value, label: value }));
+
+    if (custom.length === 0) {
+        return MIME_TYPE_GROUPS;
+    }
+
+    return [...MIME_TYPE_GROUPS, { label: 'Personalizados', options: custom }];
+}
+
 export function createField(
     type: TemplateFieldType,
     fields: TemplateField[],

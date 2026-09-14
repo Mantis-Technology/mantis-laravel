@@ -49,37 +49,35 @@ class AssetCardController extends Controller
         return Inertia::render('AssetCards/index', [
             'assetCards' => $assetCards,
             'createUrl' => route('asset-cards.create'),
+            'templates' => $this->templatesWithVersions(),
         ]);
     }
 
-    public function create(Request $request): Response
+    public function create(Request $request): Response|RedirectResponse
     {
         $templateId = $request->integer('template_id');
         $version = $request->integer('version');
-        $selectedTemplate = null;
-        $sections = [];
 
-        if ($templateId > 0 && $version > 0) {
-            $template = AssetCardTemplate::query()->find($templateId);
+        if ($templateId <= 0 || $version <= 0) {
+            return redirect()->route('asset-cards.index');
+        }
 
-            if (
-                $template instanceof AssetCardTemplate &&
-                $template->versions()->where('version', $version)->exists()
-            ) {
-                $selectedTemplate = [
-                    'id' => $template->id,
-                    'name' => $template->name,
-                    'version' => $version,
-                ];
-                $sections = $this->templateSections->forVersion($template, $version);
-            }
+        $template = AssetCardTemplate::query()->find($templateId);
+
+        if (
+            ! $template instanceof AssetCardTemplate ||
+            $template->versions()->where('version', $version)->doesntExist()
+        ) {
+            return redirect()->route('asset-cards.index');
         }
 
         return Inertia::render('AssetCards/Create/index', [
-            'templates' => $this->templatesWithVersions(),
-            'selectedTemplate' => $selectedTemplate,
-            'sections' => $sections,
-            'createUrl' => route('asset-cards.create'),
+            'template' => [
+                'id' => $template->id,
+                'name' => $template->name,
+                'version' => $version,
+            ],
+            'sections' => $this->templateSections->forVersion($template, $version),
             'action' => route('asset-cards.store'),
             'cancelUrl' => route('asset-cards.index'),
         ]);

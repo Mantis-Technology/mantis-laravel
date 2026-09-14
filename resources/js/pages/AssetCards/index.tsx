@@ -1,5 +1,6 @@
 import { Link, router } from '@inertiajs/react';
-import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
+import { ArrowRight, Eye, Pencil, Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,22 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import { Field, FieldLabel } from '@/components/ui/field';
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import {
     Table,
     TableBody,
     TableCell,
@@ -19,14 +36,52 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
-import type { AssetCardListItem } from '@/types/assetCards/assetCard';
+import type {
+    AssetCardListItem,
+    AssetTemplateOption,
+} from '@/types/assetCards/assetCard';
 
 interface Props {
     assetCards: AssetCardListItem[];
     createUrl: string;
+    templates: AssetTemplateOption[];
 }
 
-export default function AssetCardsIndex({ assetCards, createUrl }: Props) {
+export default function AssetCardsIndex({
+    assetCards,
+    createUrl,
+    templates,
+}: Props) {
+    const [createOpen, setCreateOpen] = useState(false);
+    const [templateId, setTemplateId] = useState<number | null>(null);
+    const [version, setVersion] = useState<number | null>(null);
+
+    const selectedOption =
+        templates.find((template) => template.id === templateId) ?? null;
+    const versions = selectedOption?.versions ?? [];
+
+    function openCreate() {
+        setTemplateId(templates[0]?.id ?? null);
+        setVersion(templates[0]?.versions[0] ?? null);
+        setCreateOpen(true);
+    }
+
+    function changeTemplate(value: string | null) {
+        const template =
+            templates.find((item) => String(item.id) === value) ?? null;
+
+        setTemplateId(template?.id ?? null);
+        setVersion(template?.versions[0] ?? null);
+    }
+
+    function continueToForm() {
+        if (templateId === null || version === null) {
+            return;
+        }
+
+        router.get(createUrl, { template_id: templateId, version });
+    }
+
     function destroy(assetCard: AssetCardListItem) {
         router.delete(assetCard.destroy_url, { preserveScroll: true });
     }
@@ -44,7 +99,7 @@ export default function AssetCardsIndex({ assetCards, createUrl }: Props) {
                     </p>
                 </div>
 
-                <Button render={<Link href={createUrl} />}>
+                <Button type="button" onClick={openCreate}>
                     <Plus /> Nueva ficha
                 </Button>
             </div>
@@ -69,7 +124,8 @@ export default function AssetCardsIndex({ assetCards, createUrl }: Props) {
 
                             <Button
                                 variant="outline"
-                                render={<Link href={createUrl} />}
+                                type="button"
+                                onClick={openCreate}
                             >
                                 <Plus /> Nueva ficha
                             </Button>
@@ -157,6 +213,112 @@ export default function AssetCardsIndex({ assetCards, createUrl }: Props) {
                     )}
                 </CardContent>
             </Card>
+
+            <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Nueva ficha de activo</DialogTitle>
+
+                        <DialogDescription>
+                            Selecciona la plantilla y la versión para continuar
+                            con el formulario.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    {templates.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">
+                            No hay plantillas disponibles. Crea una plantilla
+                            primero.
+                        </p>
+                    ) : (
+                        <div className="space-y-4">
+                            <Field>
+                                <FieldLabel>Plantilla</FieldLabel>
+
+                                <Select
+                                    items={templates.map((template) => ({
+                                        value: String(template.id),
+                                        label: template.name,
+                                    }))}
+                                    value={
+                                        templateId === null
+                                            ? ''
+                                            : String(templateId)
+                                    }
+                                    onValueChange={changeTemplate}
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Seleccionar plantilla" />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            {templates.map((template) => (
+                                                <SelectItem
+                                                    key={template.id}
+                                                    value={String(template.id)}
+                                                >
+                                                    {template.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </Field>
+
+                            <Field>
+                                <FieldLabel>Versión</FieldLabel>
+
+                                <Select
+                                    items={versions.map((value) => ({
+                                        value: String(value),
+                                        label: `v${value}`,
+                                    }))}
+                                    value={
+                                        version === null ? '' : String(version)
+                                    }
+                                    onValueChange={(value) =>
+                                        setVersion(
+                                            value === null
+                                                ? null
+                                                : Number(value),
+                                        )
+                                    }
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue placeholder="Seleccionar versión" />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        <SelectGroup>
+                                            {versions.map((value) => (
+                                                <SelectItem
+                                                    key={value}
+                                                    value={String(value)}
+                                                >
+                                                    v{value}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectGroup>
+                                    </SelectContent>
+                                </Select>
+                            </Field>
+
+                            <div className="flex justify-end">
+                                <Button
+                                    type="button"
+                                    disabled={
+                                        templateId === null || version === null
+                                    }
+                                    onClick={continueToForm}
+                                >
+                                    Continuar <ArrowRight />
+                                </Button>
+                            </div>
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

@@ -232,18 +232,18 @@ export default function Builder({
         <BuilderContext.Provider value={context}>
             <div className="flex h-[calc(100svh-6rem)] flex-col gap-4">
                 <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card px-3 py-2 shadow-sm">
-                    <div className="flex items-center gap-3">
-                        <div>
-                            <h1 className="text-lg font-semibold">
-                                {template.name}
-                            </h1>
+                    <div>
+                        <h1 className="text-lg font-semibold">
+                            {template.name}
+                        </h1>
 
-                            <p className="text-sm text-muted-foreground">
-                                {template.description ??
-                                    'Diseña las secciones y campos de la plantilla'}
-                            </p>
-                        </div>
+                        <p className="text-sm text-muted-foreground">
+                            {template.description ??
+                                'Diseña las secciones y campos de la plantilla'}
+                        </p>
+                    </div>
 
+                    <div className="flex flex-wrap items-center gap-2">
                         <Select
                             items={versions.map((option) => ({
                                 value: String(option.version),
@@ -278,9 +278,7 @@ export default function Builder({
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
-                    </div>
 
-                    <div className="flex items-center gap-2">
                         <Button
                             type="button"
                             variant="outline"

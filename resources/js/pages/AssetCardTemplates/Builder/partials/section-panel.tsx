@@ -1,11 +1,13 @@
 import { Trash2, Undo2 } from 'lucide-react';
+import { useState } from 'react';
 
 import { FieldPreview } from '@/components/asset-card-templates/field-preview';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Field, FieldLabel } from '@/components/ui/field';
+import { Field, FieldDescription, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { MultiSelect } from '@/components/ui/multi-select';
 import {
     Select,
     SelectContent,
@@ -23,7 +25,10 @@ import type {
     AssetCardTemplateSection,
     TemplateField,
 } from '@/types/assetCardTemplates/assetCardTemplate';
-import { fieldTypeMeta } from '@/types/assetCardTemplates/assetCardTemplate';
+import {
+    fieldTypeMeta,
+    mimeTypeGroupsFor,
+} from '@/types/assetCardTemplates/assetCardTemplate';
 
 import { useBuilder } from './builder-context';
 import { FieldOptionsEditor } from './field-options-editor';
@@ -57,6 +62,44 @@ interface FieldSettingsProps {
 
 const COLUMN_OPTIONS = Array.from({ length: 12 }, (_, index) => index + 1);
 
+type FileSizeUnit = 'B' | 'KB' | 'MB';
+
+const FILE_SIZE_UNITS: { value: FileSizeUnit; label: string }[] = [
+    { value: 'B', label: 'Bytes' },
+    { value: 'KB', label: 'KB' },
+    { value: 'MB', label: 'MB' },
+];
+
+function fileSizeFactor(unit: FileSizeUnit): number {
+    if (unit === 'MB') {
+        return 1024 * 1024;
+    }
+
+    if (unit === 'KB') {
+        return 1024;
+    }
+
+    return 1;
+}
+
+function inferFileSizeUnit(bytes: number): FileSizeUnit {
+    if (bytes <= 0 || bytes % (1024 * 1024) === 0) {
+        return 'MB';
+    }
+
+    if (bytes % 1024 === 0) {
+        return 'KB';
+    }
+
+    return 'B';
+}
+
+function formatFileSizeValue(bytes: number, unit: FileSizeUnit): string {
+    const value = bytes / fileSizeFactor(unit);
+
+    return String(Math.round(value * 1000) / 1000);
+}
+
 export function SectionPanel({ section, fieldIndex }: SectionPanelProps) {
     const {
         selectSection,
@@ -81,6 +124,7 @@ export function SectionPanel({ section, fieldIndex }: SectionPanelProps) {
         <aside className="flex w-80 shrink-0 flex-col overflow-y-auto rounded-xl border bg-card">
             {field !== null && fieldIndex !== null ? (
                 <FieldSettings
+                    key={`${section.id}-${fieldIndex}`}
                     section={section}
                     field={field}
                     fieldIndex={fieldIndex}
@@ -192,9 +236,33 @@ function FieldSettings({
 }: FieldSettingsProps) {
     const meta = fieldTypeMeta(field.type);
     const TypeIcon = meta.icon;
+    const [sizeUnit, setSizeUnit] = useState<FileSizeUnit>(() =>
+        inferFileSizeUnit(field.maxFileSize ?? 0),
+    );
+    const [sizeValue, setSizeValue] = useState(() =>
+        formatFileSizeValue(field.maxFileSize ?? 0, sizeUnit),
+    );
 
     function update(patch: Partial<TemplateField>) {
         onUpdate(section.id, fieldIndex, patch);
+    }
+
+    function handleSizeChange(value: string) {
+        setSizeValue(value);
+
+        const numeric = Number(value);
+
+        update({
+            maxFileSize:
+                Number.isFinite(numeric) && numeric > 0
+                    ? Math.round(numeric * fileSizeFactor(sizeUnit))
+                    : 0,
+        });
+    }
+
+    function handleSizeUnitChange(unit: FileSizeUnit) {
+        setSizeUnit(unit);
+        setSizeValue(formatFileSizeValue(field.maxFileSize ?? 0, unit));
     }
 
     return (
@@ -313,39 +381,72 @@ function FieldSettings({
             {field.type === 'file' && (
                 <>
                     <Field>
-                        <FieldLabel htmlFor="field-mime">
-                            Tipos MIME (separados por coma)
-                        </FieldLabel>
+                        <FieldLabel>Tipos de archivo permitidos</FieldLabel>
 
-                        <Input
-                            id="field-mime"
-                            value={(field.mimeTypes ?? []).join(', ')}
-                            onChange={(event) =>
-                                update({
-                                    mimeTypes: event.target.value
-                                        .split(',')
-                                        .map((value) => value.trim())
-                                        .filter((value) => value !== ''),
-                                })
-                            }
+                        <MultiSelect
+                            groups={mimeTypeGroupsFor(field.mimeTypes ?? [])}
+                            value={field.mimeTypes ?? []}
+                            onChange={(mimeTypes) => update({ mimeTypes })}
+                            placeholder="Selecciona los tipos de archivo"
                         />
+
+                        <FieldDescription>
+                            Si no seleccionas ninguno, se aceptará cualquier
+                            archivo.
+                        </FieldDescription>
                     </Field>
 
                     <Field>
                         <FieldLabel htmlFor="field-max-size">
-                            Tamaño máximo (bytes)
+                            Tamaño máximo
                         </FieldLabel>
 
-                        <Input
-                            id="field-max-size"
-                            type="number"
-                            value={field.maxFileSize ?? 0}
-                            onChange={(event) =>
-                                update({
-                                    maxFileSize: Number(event.target.value),
-                                })
-                            }
-                        />
+                        <div className="flex gap-2">
+                            <Input
+                                id="field-max-size"
+                                type="number"
+                                min={0}
+                                step="any"
+                                className="flex-1"
+                                value={sizeValue}
+                                onChange={(event) =>
+                                    handleSizeChange(event.target.value)
+                                }
+                            />
+
+                            <Select
+                                items={FILE_SIZE_UNITS}
+                                value={sizeUnit}
+                                onValueChange={(value) => {
+                                    if (value !== null) {
+                                        handleSizeUnitChange(
+                                            value as FileSizeUnit,
+                                        );
+                                    }
+                                }}
+                            >
+                                <SelectTrigger className="w-24">
+                                    <SelectValue />
+                                </SelectTrigger>
+
+                                <SelectContent>
+                                    <SelectGroup>
+                                        {FILE_SIZE_UNITS.map((unit) => (
+                                            <SelectItem
+                                                key={unit.value}
+                                                value={unit.value}
+                                            >
+                                                {unit.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <FieldDescription>
+                            Se guarda internamente en bytes.
+                        </FieldDescription>
                     </Field>
                 </>
             )}
