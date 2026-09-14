@@ -14,6 +14,7 @@ import {
 import type {
     AssetCardSummary,
     AssetFieldValue,
+    AssetFileUrls,
     AssetFormValues,
     AssetTemplateSummary,
 } from '@/types/assetCards/assetCard';
@@ -27,6 +28,7 @@ interface Props {
     template: AssetTemplateSummary;
     sections: AssetCardTemplateSection[];
     values: AssetFormValues;
+    fileUrls: AssetFileUrls;
     editUrl: string;
     indexUrl: string;
 }
@@ -56,6 +58,7 @@ export default function AssetCardsShow({
     template,
     sections,
     values,
+    fileUrls,
     editUrl,
     indexUrl,
 }: Props) {
@@ -117,25 +120,47 @@ export default function AssetCardsShow({
 
                                 <CardContent>
                                     <dl className="space-y-3">
-                                        {fields.map((field) => (
-                                            <div
-                                                key={field.name}
-                                                className="flex flex-col gap-0.5"
-                                            >
-                                                <dt className="text-xs font-medium text-muted-foreground">
-                                                    {field.label}
-                                                </dt>
+                                        {fields.map((field) => {
+                                            const value =
+                                                values[section.id]?.[
+                                                    field.name
+                                                ] ?? null;
+                                            const fileUrl =
+                                                fileUrls[section.id]?.[
+                                                    field.name
+                                                ];
 
-                                                <dd className="text-sm">
-                                                    {formatValue(
-                                                        field,
-                                                        values[section.id]?.[
-                                                            field.name
-                                                        ] ?? null,
-                                                    )}
-                                                </dd>
-                                            </div>
-                                        ))}
+                                            return (
+                                                <div
+                                                    key={field.name}
+                                                    className="flex flex-col gap-0.5"
+                                                >
+                                                    <dt className="text-xs font-medium text-muted-foreground">
+                                                        {field.label}
+                                                    </dt>
+
+                                                    <dd className="text-sm">
+                                                        {field.type ===
+                                                            'file' &&
+                                                        fileUrl ? (
+                                                            <a
+                                                                href={fileUrl}
+                                                                target="_blank"
+                                                                rel="noreferrer"
+                                                                className="underline"
+                                                            >
+                                                                Ver archivo
+                                                            </a>
+                                                        ) : (
+                                                            formatValue(
+                                                                field,
+                                                                value,
+                                                            )
+                                                        )}
+                                                    </dd>
+                                                </div>
+                                            );
+                                        })}
                                     </dl>
                                 </CardContent>
                             </Card>

@@ -3,6 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 
 import type {
     AssetCardSummary,
+    AssetFileUrls,
     AssetFormValues,
     AssetTemplateSummary,
 } from '@/types/assetCards/assetCard';
@@ -15,6 +16,7 @@ interface Props {
     template: AssetTemplateSummary;
     sections: AssetCardTemplateSection[];
     values: AssetFormValues;
+    fileUrls: AssetFileUrls;
     action: string;
     cancelUrl: string;
 }
@@ -24,6 +26,7 @@ export default function AssetCardsEdit({
     template,
     sections,
     values,
+    fileUrls,
     action,
     cancelUrl,
 }: Props) {
@@ -57,6 +60,7 @@ export default function AssetCardsEdit({
                 sections={sections}
                 initialCode={assetCard.code}
                 initialValues={values}
+                fileUrls={fileUrls}
                 cancelUrl={cancelUrl}
             />
         </div>

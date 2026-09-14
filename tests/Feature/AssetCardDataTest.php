@@ -24,7 +24,7 @@ beforeEach(function () {
     ])->assertSuccessful();
 });
 
-function createTemplateSection(): AssetCardTemplateSection
+function createTemplateSectionWith(array $fields): AssetCardTemplateSection
 {
     $template = AssetCardTemplate::query()->create([
         'name' => 'Equipo',
@@ -42,18 +42,23 @@ function createTemplateSection(): AssetCardTemplateSection
         'name' => 'Datos',
         'order' => 1,
         'columns' => 12,
-        'fields' => [
-            ['name' => 'title', 'label' => 'Título', 'type' => 'text', 'required' => true, 'order' => 1],
-            ['name' => 'amount', 'label' => 'Monto', 'type' => 'number', 'required' => false, 'order' => 2],
-            ['name' => 'active', 'label' => 'Activo', 'type' => 'checkbox', 'required' => false, 'order' => 3],
-            [
-                'name' => 'kind',
-                'label' => 'Tipo',
-                'type' => 'select',
-                'required' => false,
-                'order' => 4,
-                'options' => [['value' => 'a', 'label' => 'A']],
-            ],
+        'fields' => $fields,
+    ]);
+}
+
+function createTemplateSection(): AssetCardTemplateSection
+{
+    return createTemplateSectionWith([
+        ['name' => 'title', 'label' => 'Título', 'type' => 'text', 'required' => true, 'order' => 1],
+        ['name' => 'amount', 'label' => 'Monto', 'type' => 'number', 'required' => false, 'order' => 2],
+        ['name' => 'active', 'label' => 'Activo', 'type' => 'checkbox', 'required' => false, 'order' => 3],
+        [
+            'name' => 'kind',
+            'label' => 'Tipo',
+            'type' => 'select',
+            'required' => false,
+            'order' => 4,
+            'options' => [['value' => 'a', 'label' => 'A']],
         ],
     ]);
 }
@@ -121,4 +126,41 @@ test('builds validation rules from the template sections', function () {
         ->and($rules["{$prefix}.amount"])->toContain('numeric')
         ->and($rules["{$prefix}.active"])->toContain('boolean')
         ->and($rules["{$prefix}.kind"])->toContain('string');
+});
+
+test('builds file rules and stores the uploaded path as value', function () {
+    $section = createTemplateSectionWith([
+        [
+            'name' => 'attachment',
+            'label' => 'Adjunto',
+            'type' => 'file',
+            'required' => true,
+            'order' => 1,
+            'mimeTypes' => ['application/pdf'],
+            'maxFileSize' => 1048576,
+        ],
+    ]);
+
+    $sections = app(TemplateSections::class)->forVersion(
+        AssetCardTemplate::query()->findOrFail($section->asset_card_template_id),
+        1,
+    );
+
+    $sectionId = $section->getKey();
+    $rules = app(AssetCardRules::class)->forSections($sections);
+
+    expect($rules)->toHaveKey("files.{$sectionId}.attachment")
+        ->and($rules["files.{$sectionId}.attachment"])->toContain('file')
+        ->and($rules["files.{$sectionId}.attachment"])->toContain('mimetypes:application/pdf')
+        ->and($rules["files.{$sectionId}.attachment"])->toContain('max:1024')
+        ->and($rules)->toHaveKey("remove_files.{$sectionId}.attachment");
+
+    $data = app(BuildAssetCardData::class)->execute($sections, [
+        $sectionId => ['attachment' => 'asset-cards/abc/document.pdf'],
+    ]);
+
+    expect($data[$sectionId]['attachment'])->toBe([
+        'type' => 'file',
+        'value' => 'asset-cards/abc/document.pdf',
+    ]);
 });

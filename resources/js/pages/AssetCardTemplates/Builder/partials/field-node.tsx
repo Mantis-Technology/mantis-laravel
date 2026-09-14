@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { fieldTypeLabel } from '@/types/assetCardTemplates/assetCardTemplate';
+import { fieldTypeMeta } from '@/types/assetCardTemplates/assetCardTemplate';
 
 import type { TemplateField } from '@/types/assetCardTemplates/assetCardTemplate';
 
@@ -22,14 +22,16 @@ export function FieldNode({ data }: NodeProps<FieldNodeType>) {
     const { sectionId, fieldIndex, field } = data;
     const isSelected =
         selectedSectionId === sectionId && selectedFieldIndex === fieldIndex;
+    const meta = fieldTypeMeta(field.type);
+    const TypeIcon = meta.icon;
 
     return (
         <div
             className={cn(
-                'flex h-full cursor-grab items-center gap-2 rounded-lg border bg-background px-2.5 text-sm shadow-sm transition-colors active:cursor-grabbing',
+                'flex h-full cursor-grab items-center gap-2 rounded-lg border bg-background px-2.5 text-sm shadow-sm transition-colors select-none active:cursor-grabbing',
                 isSelected
                     ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
-                    : 'hover:bg-muted',
+                    : 'hover:border-primary/40 hover:bg-muted/60',
             )}
         >
             <span className="w-4 shrink-0 text-center text-xs text-muted-foreground">
@@ -38,8 +40,12 @@ export function FieldNode({ data }: NodeProps<FieldNodeType>) {
 
             <span className="min-w-0 flex-1 truncate">{field.label}</span>
 
-            <Badge variant="outline" className="shrink-0">
-                {fieldTypeLabel(field.type)}
+            <Badge
+                variant="outline"
+                className={cn('shrink-0 gap-1', meta.color)}
+            >
+                <TypeIcon />
+                {meta.label}
             </Badge>
 
             {field.required && (
@@ -48,7 +54,7 @@ export function FieldNode({ data }: NodeProps<FieldNodeType>) {
 
             <button
                 type="button"
-                className="nodrag shrink-0 text-muted-foreground transition-colors hover:text-destructive"
+                className="nodrag shrink-0 cursor-pointer rounded-md p-0.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
                 onClick={(event) => {
                     event.stopPropagation();
                     removeField(sectionId, fieldIndex);

@@ -60,7 +60,6 @@ class BuildAssetCardData
             'checkbox' => (bool) $value,
             'number' => $this->normalizeNumber($value),
             'select_multiple' => is_array($value) ? array_values($value) : [],
-            'file' => null,
             default => $this->normalizeString($value),
         };
     }

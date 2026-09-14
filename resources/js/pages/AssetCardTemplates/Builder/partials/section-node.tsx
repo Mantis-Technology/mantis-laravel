@@ -33,11 +33,11 @@ export function SectionNode({ data }: NodeProps<SectionNodeType>) {
     return (
         <div
             className={cn(
-                'flex h-full flex-col overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm',
+                'flex h-full flex-col overflow-hidden rounded-xl border bg-card text-card-foreground shadow-sm transition-shadow hover:shadow-md',
                 isSelected && 'border-primary ring-2 ring-primary/30',
             )}
         >
-            <div className="flex items-center gap-1.5 border-b bg-muted/40 px-2.5 py-2">
+            <div className="flex cursor-grab items-center gap-1.5 border-b bg-muted/40 px-2.5 py-2 select-none active:cursor-grabbing">
                 <GripVertical className="size-4 shrink-0 text-muted-foreground" />
 
                 <span className="min-w-0 flex-1 truncate text-sm font-medium">
@@ -52,7 +52,7 @@ export function SectionNode({ data }: NodeProps<SectionNodeType>) {
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    className="nodrag"
+                    className="nodrag hover:bg-destructive/10 hover:text-destructive"
                     onClick={(event) => {
                         event.stopPropagation();
                         removeSection(section.id);
@@ -78,7 +78,7 @@ export function SectionNode({ data }: NodeProps<SectionNodeType>) {
                                 type="button"
                                 variant="outline"
                                 size="sm"
-                                className="nodrag w-full"
+                                className="nodrag w-full border-dashed hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
                             />
                         }
                     >
@@ -92,16 +92,30 @@ export function SectionNode({ data }: NodeProps<SectionNodeType>) {
                         <DropdownMenuGroup>
                             <DropdownMenuLabel>Tipo de campo</DropdownMenuLabel>
 
-                            {FIELD_TYPE_OPTIONS.map((option) => (
-                                <DropdownMenuItem
-                                    key={option.value}
-                                    onClick={() =>
-                                        addField(section.id, option.value)
-                                    }
-                                >
-                                    {option.label}
-                                </DropdownMenuItem>
-                            ))}
+                            {FIELD_TYPE_OPTIONS.map((option) => {
+                                const OptionIcon = option.icon;
+
+                                return (
+                                    <DropdownMenuItem
+                                        key={option.value}
+                                        className="cursor-pointer"
+                                        onClick={() =>
+                                            addField(section.id, option.value)
+                                        }
+                                    >
+                                        <span
+                                            className={cn(
+                                                'flex size-5 shrink-0 items-center justify-center rounded-md border',
+                                                option.color,
+                                            )}
+                                        >
+                                            <OptionIcon className="size-3" />
+                                        </span>
+
+                                        {option.label}
+                                    </DropdownMenuItem>
+                                );
+                            })}
                         </DropdownMenuGroup>
                     </DropdownMenuContent>
                 </DropdownMenu>

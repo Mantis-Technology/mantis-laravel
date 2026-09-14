@@ -39,6 +39,13 @@ class AssetCardRules
                     continue;
                 }
 
+                if ($type === 'file') {
+                    $rules["files.{$sectionId}.{$name}"] = $this->fileRules($field);
+                    $rules["remove_files.{$sectionId}.{$name}"] = ['nullable', 'boolean'];
+
+                    continue;
+                }
+
                 $rules["values.{$sectionId}.{$name}"] = $this->rulesForField($field, $type);
             }
         }
@@ -67,9 +74,36 @@ class AssetCardRules
             'url' => ['url'],
             'date' => ['date'],
             'select_multiple' => ['array'],
-            'file' => [],
             default => ['string'],
         }];
+    }
+
+    /**
+     * @param  array<string, mixed>  $field
+     * @return array<int, mixed>
+     */
+    private function fileRules(array $field): array
+    {
+        $rules = ['nullable', 'file'];
+
+        $mimeTypes = $field['mimeTypes'] ?? [];
+
+        if (is_array($mimeTypes) && $mimeTypes !== []) {
+            $types = array_map(
+                static fn (mixed $value): string => (string) $value,
+                $mimeTypes
+            );
+
+            $rules[] = 'mimetypes:'.implode(',', $types);
+        }
+
+        $maxFileSize = $field['maxFileSize'] ?? null;
+
+        if (is_numeric($maxFileSize) && (int) $maxFileSize > 0) {
+            $rules[] = 'max:'.(int) ceil(((int) $maxFileSize) / 1024);
+        }
+
+        return $rules;
     }
 
     /**

@@ -231,7 +231,7 @@ export default function Builder({
     return (
         <BuilderContext.Provider value={context}>
             <div className="flex h-[calc(100svh-6rem)] flex-col gap-4">
-                <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-card px-3 py-2 shadow-sm">
                     <div className="flex items-center gap-3">
                         <div>
                             <h1 className="text-lg font-semibold">

@@ -1,10 +1,5 @@
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-    Field,
-    FieldDescription,
-    FieldError,
-    FieldLabel,
-} from '@/components/ui/field';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
     Select,
@@ -151,21 +146,6 @@ export function AssetFieldInput({
                             </label>
                         ))}
                     </div>
-
-                    <FieldError>{error}</FieldError>
-                </Field>
-            );
-
-        case 'file':
-            return (
-                <Field data-invalid={!!error}>
-                    {label}
-
-                    <Input id={field.name} type="file" disabled />
-
-                    <FieldDescription>
-                        La carga de archivos estará disponible próximamente.
-                    </FieldDescription>
 
                     <FieldError>{error}</FieldError>
                 </Field>

@@ -12,7 +12,10 @@ use App\Services\BuildAssetCardData;
 use App\Services\TemplateSections;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -101,11 +104,19 @@ class AssetCardController extends Controller
         $sections = $this->templateSections->forVersion($template, $version);
         $request->validate($this->rules->forSections($sections));
 
+        $values = $this->resolveFileUploads(
+            $request,
+            $sections,
+            $this->submittedValues($request),
+            null
+        );
+        $this->ensureRequiredFiles($sections, $values);
+
         $assetCard = AssetCard::query()->create([
             'asset_card_template_id' => $template->id,
             'version' => $version,
             'code' => (string) $validated['code'],
-            'data' => $this->buildData->execute($sections, $this->submittedValues($request)),
+            'data' => $this->buildData->execute($sections, $values),
         ]);
 
         return redirect()
@@ -117,6 +128,7 @@ class AssetCardController extends Controller
     {
         $template = AssetCardTemplate::query()->findOrFail($assetCard->asset_card_template_id);
         $sections = $this->templateSections->forVersion($template, $assetCard->version);
+        $values = $this->valuesFromData($assetCard->data);
 
         return Inertia::render('AssetCards/Show/index', [
             'assetCard' => [
@@ -129,7 +141,8 @@ class AssetCardController extends Controller
                 'version' => $assetCard->version,
             ],
             'sections' => $sections,
-            'values' => $this->valuesFromData($assetCard->data),
+            'values' => $values,
+            'fileUrls' => $this->fileUrls($assetCard, $sections, $values),
             'editUrl' => route('asset-cards.edit', $assetCard),
             'indexUrl' => route('asset-cards.index'),
         ]);
@@ -139,6 +152,7 @@ class AssetCardController extends Controller
     {
         $template = AssetCardTemplate::query()->findOrFail($assetCard->asset_card_template_id);
         $sections = $this->templateSections->forVersion($template, $assetCard->version);
+        $values = $this->valuesFromData($assetCard->data);
 
         return Inertia::render('AssetCards/Edit/index', [
             'assetCard' => [
@@ -151,7 +165,8 @@ class AssetCardController extends Controller
                 'version' => $assetCard->version,
             ],
             'sections' => $sections,
-            'values' => $this->valuesFromData($assetCard->data),
+            'values' => $values,
+            'fileUrls' => $this->fileUrls($assetCard, $sections, $values),
             'action' => route('asset-cards.update', $assetCard),
             'cancelUrl' => route('asset-cards.show', $assetCard),
         ]);
@@ -173,9 +188,17 @@ class AssetCardController extends Controller
         $sections = $this->templateSections->forVersion($template, $assetCard->version);
         $request->validate($this->rules->forSections($sections));
 
+        $values = $this->resolveFileUploads(
+            $request,
+            $sections,
+            $this->submittedValues($request),
+            $assetCard->data
+        );
+        $this->ensureRequiredFiles($sections, $values);
+
         $assetCard->update([
             'code' => (string) $validated['code'],
-            'data' => $this->buildData->execute($sections, $this->submittedValues($request)),
+            'data' => $this->buildData->execute($sections, $values),
         ]);
 
         return redirect()
@@ -213,6 +236,171 @@ class AssetCardController extends Controller
             ])
             ->values()
             ->all();
+    }
+
+    /**
+     * Resolves the file values for the given sections, storing new uploads on
+     * the tenant disk and keeping the existing value when no new file or
+     * removal flag is present.
+     *
+     * @param  array<int, array<string, mixed>>  $sections
+     * @param  array<string, mixed>  $values
+     * @return array<string, mixed>
+     */
+    private function resolveFileUploads(
+        Request $request,
+        array $sections,
+        array $values,
+        mixed $existingData
+    ): array {
+        $existing = is_array($existingData) ? $existingData : [];
+
+        foreach ($sections as $section) {
+            $sectionId = $section['id'] ?? null;
+            $fields = $section['fields'] ?? [];
+
+            if (! is_string($sectionId) || ! is_array($fields)) {
+                continue;
+            }
+
+            foreach ($fields as $field) {
+                if (! is_array($field) || ($field['type'] ?? null) !== 'file') {
+                    continue;
+                }
+
+                $name = $field['name'] ?? null;
+
+                if (! is_string($name)) {
+                    continue;
+                }
+
+                $file = $request->file("files.{$sectionId}.{$name}");
+
+                if ($file instanceof UploadedFile) {
+                    $values[$sectionId][$name] = $this->storeFile($file, $sectionId, $name);
+
+                    continue;
+                }
+
+                if ($request->boolean("remove_files.{$sectionId}.{$name}")) {
+                    $values[$sectionId][$name] = null;
+
+                    continue;
+                }
+
+                $existingValue = $existing[$sectionId][$name]['value'] ?? null;
+                $values[$sectionId][$name] = is_string($existingValue) ? $existingValue : null;
+            }
+        }
+
+        return $values;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $sections
+     * @param  array<string, mixed>  $values
+     *
+     * @throws ValidationException
+     */
+    private function ensureRequiredFiles(array $sections, array $values): void
+    {
+        $errors = [];
+
+        foreach ($sections as $section) {
+            $sectionId = $section['id'] ?? null;
+            $fields = $section['fields'] ?? [];
+
+            if (! is_string($sectionId) || ! is_array($fields)) {
+                continue;
+            }
+
+            foreach ($fields as $field) {
+                if (
+                    ! is_array($field) ||
+                    ($field['type'] ?? null) !== 'file' ||
+                    ! ($field['required'] ?? false)
+                ) {
+                    continue;
+                }
+
+                $name = $field['name'] ?? null;
+
+                if (! is_string($name)) {
+                    continue;
+                }
+
+                $value = $values[$sectionId][$name] ?? null;
+
+                if (! is_string($value) || $value === '') {
+                    $errors["values.{$sectionId}.{$name}"] = 'Este campo es obligatorio.';
+                }
+            }
+        }
+
+        if ($errors !== []) {
+            throw ValidationException::withMessages($errors);
+        }
+    }
+
+    private function storeFile(UploadedFile $file, string $sectionId, string $fieldName): ?string
+    {
+        $extension = $file->getClientOriginalExtension();
+        $baseName = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+        $baseName = $baseName !== '' ? $baseName : $fieldName;
+        $suffix = $extension !== '' ? ".{$extension}" : '';
+
+        $path = $file->storeAs(
+            "asset-cards/{$sectionId}",
+            "{$baseName}-".Str::random(8).$suffix,
+            'local'
+        );
+
+        return is_string($path) ? $path : null;
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $sections
+     * @param  array<string, mixed>  $values
+     * @return array<string, array<string, string>>
+     */
+    private function fileUrls(AssetCard $assetCard, array $sections, array $values): array
+    {
+        $urls = [];
+
+        foreach ($sections as $section) {
+            $sectionId = $section['id'] ?? null;
+            $fields = $section['fields'] ?? [];
+
+            if (! is_string($sectionId) || ! is_array($fields)) {
+                continue;
+            }
+
+            foreach ($fields as $field) {
+                if (! is_array($field) || ($field['type'] ?? null) !== 'file') {
+                    continue;
+                }
+
+                $name = $field['name'] ?? null;
+
+                if (! is_string($name)) {
+                    continue;
+                }
+
+                $path = $values[$sectionId][$name] ?? null;
+
+                if (! is_string($path) || $path === '') {
+                    continue;
+                }
+
+                $urls[$sectionId][$name] = route('asset-cards.files.show', [
+                    'assetCard' => $assetCard,
+                    'section' => $sectionId,
+                    'field' => $name,
+                ]);
+            }
+        }
+
+        return $urls;
     }
 
     /**

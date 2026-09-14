@@ -2,6 +2,12 @@ export type AssetFieldValue = string | number | boolean | null;
 
 export type AssetFormValues = Record<string, Record<string, AssetFieldValue>>;
 
+export type AssetFileValues = Record<string, Record<string, File | null>>;
+
+export type AssetFileRemovals = Record<string, Record<string, boolean>>;
+
+export type AssetFileUrls = Record<string, Record<string, string>>;
+
 export type AssetCardListItem = {
     id: number;
     code: string;

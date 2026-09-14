@@ -68,7 +68,11 @@ export function BuilderCanvas() {
         return () => observer.disconnect();
     }, []);
 
-    const sectionLayouts = layoutSections(sections, canvasSize.width);
+    const sectionLayouts = layoutSections(
+        sections,
+        canvasSize.width,
+        canvasSize.height,
+    );
     const fieldLayouts = layoutFields(sections, sectionLayouts);
     const sectionIds = new Set(sections.map((section) => section.id));
     const contentHeight =
@@ -263,6 +267,15 @@ export function BuilderCanvas() {
             >
                 <Background />
             </ReactFlow>
+
+            {sections.length === 0 && (
+                <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center p-6">
+                    <p className="rounded-xl border border-dashed bg-card/90 px-4 py-3 text-center text-sm text-muted-foreground shadow-sm">
+                        Añade una sección para empezar a construir el
+                        formulario.
+                    </p>
+                </div>
+            )}
         </div>
     );
 }

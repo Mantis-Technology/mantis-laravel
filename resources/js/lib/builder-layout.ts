@@ -64,6 +64,7 @@ export function sectionHeight(section: AssetCardTemplateSection): number {
 export function layoutSections(
     sections: AssetCardTemplateSection[],
     canvasWidth: number,
+    canvasHeight = 0,
 ): SectionLayout[] {
     if (canvasWidth <= CANVAS_PADDING * 2) {
         return [];
@@ -71,31 +72,69 @@ export function layoutSections(
 
     const usableWidth = canvasWidth - CANVAS_PADDING * 2;
     const unit = (usableWidth - NODE_GAP * (GRID_COLUMNS - 1)) / GRID_COLUMNS;
-    const layouts: SectionLayout[] = [];
 
+    const rows: {
+        entries: {
+            section: AssetCardTemplateSection;
+            x: number;
+            width: number;
+        }[];
+        height: number;
+    }[] = [];
+    let currentRow = { entries: [], height: 0 } as (typeof rows)[number];
     let usedColumns = 0;
     let x = CANVAS_PADDING;
-    let y = CANVAS_PADDING;
-    let rowHeight = 0;
 
     for (const section of sections) {
         const columns = Math.min(Math.max(section.columns, 1), GRID_COLUMNS);
 
         if (usedColumns + columns > GRID_COLUMNS) {
-            y += rowHeight + NODE_GAP;
+            rows.push(currentRow);
+            currentRow = { entries: [], height: 0 };
             usedColumns = 0;
             x = CANVAS_PADDING;
-            rowHeight = 0;
         }
 
         const width = columns * unit + (columns - 1) * NODE_GAP;
-        const height = sectionHeight(section);
 
-        layouts.push({ id: section.id, x, y, width, height });
+        currentRow.entries.push({ section, x, width });
+        currentRow.height = Math.max(currentRow.height, sectionHeight(section));
 
         x += width + NODE_GAP;
         usedColumns += columns;
-        rowHeight = Math.max(rowHeight, height);
+    }
+
+    if (currentRow.entries.length > 0) {
+        rows.push(currentRow);
+    }
+
+    const gapsHeight = Math.max(0, rows.length - 1) * NODE_GAP;
+    const naturalTotal =
+        rows.reduce((sum, row) => sum + row.height, 0) +
+        gapsHeight +
+        CANVAS_PADDING * 2;
+    const extraPerRow =
+        rows.length > 0
+            ? Math.max(0, canvasHeight - naturalTotal) / rows.length
+            : 0;
+
+    const layouts: SectionLayout[] = [];
+    let y = CANVAS_PADDING;
+
+    for (const row of rows) {
+        const height = row.height + extraPerRow;
+
+        for (const entry of row.entries) {
+            layouts.push({
+                id: entry.section.id,
+                x: entry.x,
+                y,
+                width: entry.width,
+                height,
+            });
+        }
+
+        y += height + NODE_GAP;
     }
 
     return layouts;

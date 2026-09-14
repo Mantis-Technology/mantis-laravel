@@ -17,12 +17,13 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
 
 import type {
     AssetCardTemplateSection,
     TemplateField,
 } from '@/types/assetCardTemplates/assetCardTemplate';
-import { fieldTypeLabel } from '@/types/assetCardTemplates/assetCardTemplate';
+import { fieldTypeMeta } from '@/types/assetCardTemplates/assetCardTemplate';
 
 import { useBuilder } from './builder-context';
 import { FieldOptionsEditor } from './field-options-editor';
@@ -189,6 +190,9 @@ function FieldSettings({
     onUpdate,
     onRemove,
 }: FieldSettingsProps) {
+    const meta = fieldTypeMeta(field.type);
+    const TypeIcon = meta.icon;
+
     function update(patch: Partial<TemplateField>) {
         onUpdate(section.id, fieldIndex, patch);
     }
@@ -213,7 +217,10 @@ function FieldSettings({
             </div>
 
             <div className="flex items-center gap-2">
-                <Badge variant="outline">{fieldTypeLabel(field.type)}</Badge>
+                <Badge variant="outline" className={cn('gap-1', meta.color)}>
+                    <TypeIcon />
+                    {meta.label}
+                </Badge>
 
                 <span className="truncate text-xs text-muted-foreground">
                     {field.name}

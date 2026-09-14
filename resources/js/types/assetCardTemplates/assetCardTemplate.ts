@@ -1,3 +1,18 @@
+import {
+    AlignLeft,
+    Calendar,
+    CheckSquare,
+    ChevronDown,
+    CircleDot,
+    Hash,
+    Link as LinkIcon,
+    Mail,
+    Paperclip,
+    Type,
+} from 'lucide-react';
+
+import type { LucideIcon } from 'lucide-react';
+
 export type TemplateFieldType =
     | 'text'
     | 'textarea'
@@ -64,26 +79,82 @@ export type BuilderVersionOption = {
 export type FieldTypeOption = {
     value: TemplateFieldType;
     label: string;
+    icon: LucideIcon;
+    color: string;
 };
 
 export const FIELD_TYPE_OPTIONS: FieldTypeOption[] = [
-    { value: 'text', label: 'Texto' },
-    { value: 'textarea', label: 'Área de texto' },
-    { value: 'select', label: 'Select' },
-    { value: 'checkbox', label: 'Checkbox' },
-    { value: 'radio', label: 'Radio' },
-    { value: 'date', label: 'Fecha' },
-    { value: 'file', label: 'Archivo' },
-    { value: 'number', label: 'Número' },
-    { value: 'email', label: 'Email' },
-    { value: 'url', label: 'URL' },
+    {
+        value: 'text',
+        label: 'Texto',
+        icon: Type,
+        color: 'border-sky-500/20 bg-sky-500/10 text-sky-600 dark:text-sky-400',
+    },
+    {
+        value: 'textarea',
+        label: 'Área de texto',
+        icon: AlignLeft,
+        color: 'border-indigo-500/20 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400',
+    },
+    {
+        value: 'select',
+        label: 'Select',
+        icon: ChevronDown,
+        color: 'border-violet-500/20 bg-violet-500/10 text-violet-600 dark:text-violet-400',
+    },
+    {
+        value: 'checkbox',
+        label: 'Checkbox',
+        icon: CheckSquare,
+        color: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+    },
+    {
+        value: 'radio',
+        label: 'Radio',
+        icon: CircleDot,
+        color: 'border-teal-500/20 bg-teal-500/10 text-teal-600 dark:text-teal-400',
+    },
+    {
+        value: 'date',
+        label: 'Fecha',
+        icon: Calendar,
+        color: 'border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-400',
+    },
+    {
+        value: 'file',
+        label: 'Archivo',
+        icon: Paperclip,
+        color: 'border-rose-500/20 bg-rose-500/10 text-rose-600 dark:text-rose-400',
+    },
+    {
+        value: 'number',
+        label: 'Número',
+        icon: Hash,
+        color: 'border-orange-500/20 bg-orange-500/10 text-orange-600 dark:text-orange-400',
+    },
+    {
+        value: 'email',
+        label: 'Email',
+        icon: Mail,
+        color: 'border-cyan-500/20 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
+    },
+    {
+        value: 'url',
+        label: 'URL',
+        icon: LinkIcon,
+        color: 'border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-400',
+    },
 ];
 
-export function fieldTypeLabel(type: TemplateFieldType): string {
+export function fieldTypeMeta(type: TemplateFieldType): FieldTypeOption {
     return (
-        FIELD_TYPE_OPTIONS.find((option) => option.value === type)?.label ??
-        type
+        FIELD_TYPE_OPTIONS.find((option) => option.value === type) ??
+        FIELD_TYPE_OPTIONS[0]
     );
+}
+
+export function fieldTypeLabel(type: TemplateFieldType): string {
+    return fieldTypeMeta(type).label;
 }
 
 export function createField(
