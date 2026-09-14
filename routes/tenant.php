@@ -3,6 +3,12 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\AccessPortalController;
+use App\Http\Controllers\AssetCards\AssetCardController;
+use App\Http\Controllers\AssetCards\AssetCardFileController;
+use App\Http\Controllers\AssetCardTemplates\AssetCardTemplateBuilderController;
+use App\Http\Controllers\AssetCardTemplates\AssetCardTemplateController;
+use App\Http\Controllers\AssetCardTemplates\AssetCardTemplatePreviewController;
+use App\Http\Controllers\AssetCardTemplates\UpdateAssetCardTemplateSectionsController;
 use App\Http\Controllers\CompanyPortalController;
 use App\Http\Controllers\parameterization\MaintenanceCategoryController;
 use App\Http\Controllers\permissions\PermissionController;
@@ -143,6 +149,59 @@ Route::middleware([
                         ->name('update');
 
                     Route::delete('/{id}', [PermissionController::class, 'destroy'])
+                        ->name('destroy');
+                });
+
+            Route::prefix('asset-card-templates')
+                ->as('asset-card-templates.')
+                ->group(function () {
+                    Route::get('/', [AssetCardTemplateController::class, 'index'])
+                        ->name('index');
+
+                    Route::get('/create', [AssetCardTemplateController::class, 'create'])
+                        ->name('create');
+
+                    Route::post('/', [AssetCardTemplateController::class, 'store'])
+                        ->name('store');
+
+                    Route::post('/{template}/versions', [AssetCardTemplateController::class, 'storeVersion'])
+                        ->name('versions.store');
+
+                    Route::get('/{template}/versions/{version}/builder', AssetCardTemplateBuilderController::class)
+                        ->name('builder');
+
+                    Route::put('/{template}/versions/{version}/builder', UpdateAssetCardTemplateSectionsController::class)
+                        ->name('builder.update');
+
+                    Route::get('/{template}/versions/{version}/preview', AssetCardTemplatePreviewController::class)
+                        ->name('preview');
+                });
+
+            Route::prefix('asset-cards')
+                ->as('asset-cards.')
+                ->group(function () {
+                    Route::get('/', [AssetCardController::class, 'index'])
+                        ->name('index');
+
+                    Route::get('/create', [AssetCardController::class, 'create'])
+                        ->name('create');
+
+                    Route::post('/', [AssetCardController::class, 'store'])
+                        ->name('store');
+
+                    Route::get('/{assetCard}', [AssetCardController::class, 'show'])
+                        ->name('show');
+
+                    Route::get('/{assetCard}/edit', [AssetCardController::class, 'edit'])
+                        ->name('edit');
+
+                    Route::get('/{assetCard}/files/{section}/{field}', AssetCardFileController::class)
+                        ->name('files.show');
+
+                    Route::put('/{assetCard}', [AssetCardController::class, 'update'])
+                        ->name('update');
+
+                    Route::delete('/{assetCard}', [AssetCardController::class, 'destroy'])
                         ->name('destroy');
                 });
         });

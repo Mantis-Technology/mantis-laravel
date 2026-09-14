@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Factories;
+
+class RadioField extends Field
+{
+    /**
+     * @var array<int, array{value: string, label: string}>
+     */
+    public array $options;
+
+    /**
+     * @param  array<int, array{value: string, label: string}>  $options
+     */
+    public function __construct(string $name, string $label, bool $required, int $order, ?string $placeholder, array $options)
+    {
+        parent::__construct($name, $label, FieldType::RADIO, $required, $order, $placeholder);
+        $this->options = $options;
+    }
+
+    protected function extraAttributes(): array
+    {
+        return ['options' => $this->options];
+    }
+}

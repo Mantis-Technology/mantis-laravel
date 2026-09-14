@@ -1,9 +1,11 @@
-import { usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
+    BoxesIcon,
     ChevronRight,
     CommandIcon,
     FolderIcon,
     LayoutDashboardIcon,
+    LayoutTemplateIcon,
     ListIcon,
     UsersIcon,
     ShieldIcon,
@@ -55,6 +57,11 @@ const data = {
             url: '/dashboard',
             icon: LayoutDashboardIcon,
         },
+        {
+            title: 'Fichas de activos',
+            url: '/asset-cards',
+            icon: BoxesIcon,
+        },
     ],
 
     parameterization: [
@@ -62,6 +69,11 @@ const data = {
             title: 'Categorías de Mantenimiento',
             url: '/parameterization/maintenance-categories',
             icon: ListIcon,
+        },
+        {
+            title: 'Plantillas de activos',
+            url: '/asset-card-templates',
+            icon: LayoutTemplateIcon,
         },
     ],
 
@@ -95,7 +107,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                     <SidebarMenuItem>
                         <SidebarMenuButton
                             className="h-auto w-full flex-col items-center justify-center gap-2 p-4!"
-                            render={<a href="/" />}
+                            render={<Link href="/" />}
                         >
                             {tenant?.logo ? (
                                 <img
@@ -142,7 +154,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                                             >
                                                 <SidebarMenuSubButton
                                                     render={
-                                                        <a href={item.url} />
+                                                        <Link href={item.url} />
                                                     }
                                                 >
                                                     {item.icon && <item.icon />}
@@ -185,7 +197,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                                                 >
                                                     <SidebarMenuSubButton
                                                         render={
-                                                            <a
+                                                            <Link
                                                                 href={item.url}
                                                             />
                                                         }
