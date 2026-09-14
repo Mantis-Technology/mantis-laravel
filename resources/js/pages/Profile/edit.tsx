@@ -1,32 +1,32 @@
-import { Head, Link, usePage } from '@inertiajs/react'
+import { Head, Link, usePage } from '@inertiajs/react';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
-import UpdatePassword from './partials/update-password'
-import UpdateProfileInformation from './partials/update-profile-information'
+import UpdatePassword from './partials/update-password';
+import UpdateProfileInformation from './partials/update-profile-information';
 
 type User = {
-    id: number
-    name: string
-    email: string
-    email_verified_at: string | null
-}
+    id: number;
+    name: string;
+    email: string;
+    email_verified_at: string | null;
+};
 
 type PageProps = {
     auth: {
-        user: User
-    }
-}
+        user: User;
+    };
+};
 
 export default function Edit() {
-    const { auth } = usePage<PageProps>().props
+    const { auth } = usePage<PageProps>().props;
 
     return (
         <>
             <Head title="Profile" />
 
-            <div className="mx-auto flex w-full max-w-4xl flex-col gap-8 p-6">
+            <div className="mx-auto flex w-full flex-col gap-8 p-6">
                 <div>
                     <h1 className="text-2xl font-semibold tracking-tight">
                         Profile
@@ -69,5 +69,5 @@ export default function Edit() {
                 </div>
             </div>
         </>
-    )
+    );
 }

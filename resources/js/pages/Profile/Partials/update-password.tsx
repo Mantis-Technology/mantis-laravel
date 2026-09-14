@@ -1,15 +1,15 @@
-import { FormEventHandler } from 'react'
-import { useForm } from '@inertiajs/react'
+import { useForm } from '@inertiajs/react';
+import type { FormEventHandler } from 'react';
 
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 type PasswordForm = {
-    current_password: string
-    password: string
-    password_confirmation: string
-}
+    current_password: string;
+    password: string;
+    password_confirmation: string;
+};
 
 export default function UpdatePassword() {
     const {
@@ -24,29 +24,23 @@ export default function UpdatePassword() {
         current_password: '',
         password: '',
         password_confirmation: '',
-    })
+    });
 
     const submit: FormEventHandler = (event) => {
-        event.preventDefault()
+        event.preventDefault();
 
         put('/user/password', {
             preserveScroll: true,
             onSuccess: () => {
-                reset(
-                    'current_password',
-                    'password',
-                    'password_confirmation',
-                )
+                reset('current_password', 'password', 'password_confirmation');
             },
-        })
-    }
+        });
+    };
 
     return (
         <form onSubmit={submit} className="space-y-6">
             <div className="space-y-2">
-                <Label htmlFor="current_password">
-                    Current password
-                </Label>
+                <Label htmlFor="current_password">Current password</Label>
 
                 <Input
                     id="current_password"
@@ -67,9 +61,7 @@ export default function UpdatePassword() {
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="password">
-                    New password
-                </Label>
+                <Label htmlFor="password">New password</Label>
 
                 <Input
                     id="password"
@@ -100,10 +92,7 @@ export default function UpdatePassword() {
                     autoComplete="new-password"
                     value={data.password_confirmation}
                     onChange={(event) =>
-                        setData(
-                            'password_confirmation',
-                            event.target.value,
-                        )
+                        setData('password_confirmation', event.target.value)
                     }
                     disabled={processing}
                 />
@@ -122,13 +111,10 @@ export default function UpdatePassword() {
             )}
 
             <div className="flex justify-end">
-                <Button
-                    type="submit"
-                    disabled={processing}
-                >
+                <Button type="submit" disabled={processing}>
                     {processing ? 'Updating...' : 'Update password'}
                 </Button>
             </div>
         </form>
-    )
+    );
 }

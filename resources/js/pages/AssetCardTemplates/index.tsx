@@ -47,7 +47,7 @@ export default function AssetCardTemplatesIndex({
     }
 
     return (
-        <div className="container mx-auto max-w-5xl py-10">
+        <div className="w-full py-10">
             <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-semibold tracking-tight">

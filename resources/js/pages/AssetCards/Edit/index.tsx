@@ -31,7 +31,7 @@ export default function AssetCardsEdit({
     cancelUrl,
 }: Props) {
     return (
-        <div className="container mx-auto max-w-5xl py-10">
+        <div className="w-full py-10">
             <Link
                 href={cancelUrl}
                 className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
@@ -58,7 +58,6 @@ export default function AssetCardsEdit({
                 templateId={template.id}
                 version={template.version}
                 sections={sections}
-                initialCode={assetCard.code}
                 initialValues={values}
                 fileUrls={fileUrls}
                 cancelUrl={cancelUrl}

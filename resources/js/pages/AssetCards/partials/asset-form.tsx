@@ -13,13 +13,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import {
-    Field,
-    FieldError,
-    FieldGroup,
-    FieldLabel,
-} from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import { FieldGroup } from '@/components/ui/field';
 
 import type {
     AssetFieldValue,
@@ -36,7 +30,6 @@ interface AssetFormProps {
     templateId: number;
     version: number;
     sections: AssetCardTemplateSection[];
-    initialCode: string;
     initialValues: AssetFormValues;
     fileUrls?: AssetFileUrls;
     cancelUrl: string;
@@ -48,13 +41,11 @@ export function AssetForm({
     templateId,
     version,
     sections,
-    initialCode,
     initialValues,
     fileUrls = {},
     cancelUrl,
 }: AssetFormProps) {
     const form = useForm({
-        code: initialCode,
         template_id: templateId,
         version,
         values: initialValues,
@@ -134,33 +125,6 @@ export function AssetForm({
 
     return (
         <form onSubmit={submit} className="space-y-4">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Código</CardTitle>
-
-                    <CardDescription>
-                        Identificador único de la ficha de activo.
-                    </CardDescription>
-                </CardHeader>
-
-                <CardContent>
-                    <Field data-invalid={!!form.errors.code}>
-                        <FieldLabel htmlFor="code">Código</FieldLabel>
-
-                        <Input
-                            id="code"
-                            value={form.data.code}
-                            disabled={form.processing}
-                            onChange={(event) =>
-                                form.setData('code', event.target.value)
-                            }
-                        />
-
-                        <FieldError>{form.errors.code}</FieldError>
-                    </Field>
-                </CardContent>
-            </Card>
-
             <div className="grid grid-cols-12 gap-4">
                 {sections.map((section) => {
                     const columns = Math.min(Math.max(section.columns, 1), 12);

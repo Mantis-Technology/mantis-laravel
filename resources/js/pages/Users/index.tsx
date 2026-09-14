@@ -56,7 +56,7 @@ export default function UsersIndex({ users }: Props) {
     };
 
     return (
-        <div className="container mx-auto py-10">
+        <div className="w-full py-10">
             <div className="mb-8 flex items-start justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-semibold tracking-tight">

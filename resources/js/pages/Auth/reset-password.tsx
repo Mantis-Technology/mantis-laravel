@@ -1,49 +1,45 @@
-import { FormEventHandler } from 'react'
-import { Head, useForm } from '@inertiajs/react'
+import { Head, useForm } from '@inertiajs/react';
+import type { FormEventHandler } from 'react';
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 type ResetPasswordForm = {
-    token: string
-    email: string
-    password: string
-    password_confirmation: string
-}
+    token: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
+};
 
 type ResetPasswordProps = {
-    token: string
-    email: string
-}
+    token: string;
+    email: string;
+};
 
-export default function ResetPassword({
-    token,
-    email,
-}: ResetPasswordProps) {
+export default function ResetPassword({ token, email }: ResetPasswordProps) {
     const { data, setData, post, processing, errors, reset } =
         useForm<ResetPasswordForm>({
             token,
             email,
             password: '',
             password_confirmation: '',
-        })
+        });
 
     const submit: FormEventHandler = (event) => {
-        event.preventDefault()
+        event.preventDefault();
 
         post('/reset-password', {
-            onFinish: () =>
-                reset('password', 'password_confirmation'),
-        })
-    }
+            onFinish: () => reset('password', 'password_confirmation'),
+        });
+    };
 
     return (
         <>
@@ -68,9 +64,7 @@ export default function ResetPassword({
                             />
 
                             <div className="space-y-2">
-                                <Label htmlFor="email">
-                                    Email
-                                </Label>
+                                <Label htmlFor="email">Email</Label>
 
                                 <Input
                                     id="email"
@@ -91,9 +85,7 @@ export default function ResetPassword({
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="password">
-                                    New password
-                                </Label>
+                                <Label htmlFor="password">New password</Label>
 
                                 <Input
                                     id="password"
@@ -154,5 +146,5 @@ export default function ResetPassword({
                 </Card>
             </div>
         </>
-    )
+    );
 }

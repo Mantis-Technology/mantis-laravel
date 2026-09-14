@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react'
+import { Head } from '@inertiajs/react';
 
 export default function Dashboard() {
     return (
@@ -11,5 +11,5 @@ export default function Dashboard() {
                 </h1>
             </div>
         </>
-    )
+    );
 }

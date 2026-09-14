@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'asset_card_template_id',
     'version',
     'code',
+    'qr_path',
     'data',
 ])]
 class AssetCard extends Model
