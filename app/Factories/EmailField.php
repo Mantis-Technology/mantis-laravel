@@ -4,8 +4,8 @@ namespace App\Factories;
 
 class EmailField extends Field
 {
-    public function __construct(string $name, bool $required, int $order)
+    public function __construct(string $name, string $label, bool $required, int $order, ?string $placeholder = null)
     {
-        parent::__construct($name, FieldType::EMAIL, $required, $order);
+        parent::__construct($name, $label, FieldType::EMAIL, $required, $order, $placeholder);
     }
 }

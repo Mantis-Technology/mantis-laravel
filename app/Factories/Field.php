@@ -6,18 +6,30 @@ abstract class Field
 {
     public string $name;
 
+    public string $label;
+
     public FieldType $type;
 
     public bool $required;
 
     public int $order;
 
-    public function __construct(string $name, FieldType $type, bool $required, int $order)
-    {
+    public ?string $placeholder;
+
+    public function __construct(
+        string $name,
+        string $label,
+        FieldType $type,
+        bool $required,
+        int $order,
+        ?string $placeholder = null
+    ) {
         $this->name = $name;
+        $this->label = $label;
         $this->type = $type;
         $this->required = $required;
         $this->order = $order;
+        $this->placeholder = $placeholder;
     }
 
     /**
@@ -27,9 +39,11 @@ abstract class Field
     {
         return [
             'name' => $this->name,
+            'label' => $this->label,
             'type' => $this->type->value,
             'required' => $this->required,
             'order' => $this->order,
+            ...($this->placeholder !== null ? ['placeholder' => $this->placeholder] : []),
             ...$this->extraAttributes(),
         ];
     }

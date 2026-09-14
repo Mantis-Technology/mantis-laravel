@@ -4,22 +4,22 @@ namespace App\Factories;
 
 class NumberField extends Field
 {
-    public int $minValue;
+    public int $min;
 
-    public int $maxValue;
+    public int $max;
 
-    public function __construct(string $name, bool $required, int $order, int $minValue, int $maxValue)
+    public function __construct(string $name, string $label, bool $required, int $order, ?string $placeholder, int $min, int $max)
     {
-        parent::__construct($name, FieldType::NUMBER, $required, $order);
-        $this->minValue = $minValue;
-        $this->maxValue = $maxValue;
+        parent::__construct($name, $label, FieldType::NUMBER, $required, $order, $placeholder);
+        $this->min = $min;
+        $this->max = $max;
     }
 
     protected function extraAttributes(): array
     {
         return [
-            'minValue' => $this->minValue,
-            'maxValue' => $this->maxValue,
+            'min' => $this->min,
+            'max' => $this->max,
         ];
     }
 }

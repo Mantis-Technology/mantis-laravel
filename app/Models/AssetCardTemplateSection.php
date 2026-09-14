@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 
 #[Fillable([
@@ -16,6 +17,10 @@ use Illuminate\Database\Eloquent\Model;
 ])]
 class AssetCardTemplateSection extends Model
 {
+    use HasUlids;
+
+    protected $primaryKey = 'ulid';
+
     protected function casts(): array
     {
         return [

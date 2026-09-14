@@ -18,8 +18,8 @@ return new class extends Migration
 
             $table->foreign(['asset_card_template_id', 'version'])
                 ->references(['asset_card_template_id', 'version'])
-                ->on('card_template_versions');
-                
+                ->on('card_template_version');
+
             $table->string('code')->unique();
             $table->json('data')->nullable();
             $table->timestamps();

@@ -14,6 +14,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 ])]
 class AssetCard extends Model
 {
+    protected function casts(): array
+    {
+        return [
+            'version' => 'integer',
+            'data' => 'array',
+        ];
+    }
+
+    /**
+     * @return BelongsTo<AssetCardTemplate, $this>
+     */
+    public function template(): BelongsTo
+    {
+        return $this->belongsTo(AssetCardTemplate::class, 'asset_card_template_id');
+    }
 
     public function templateVersion(): CardTemplateVersion
     {
@@ -22,5 +37,4 @@ class AssetCard extends Model
             ->where('version', $this->version)
             ->firstOrFail();
     }
-    
 }

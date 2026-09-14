@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('card_template_version', function (Blueprint $table) {
-            
+
             $table->foreignId('asset_card_template_id')->constrained('asset_card_templates')->onDelete('cascade');
             $table->integer('version')->default(1);
             $table->timestamps();

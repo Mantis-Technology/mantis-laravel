@@ -13,6 +13,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 ])]
 class CardTemplateVersion extends Model
 {
+    protected $table = 'card_template_version';
+
+    public $incrementing = false;
 
     // Relationships
     public function template(): BelongsTo
