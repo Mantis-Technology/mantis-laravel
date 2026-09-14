@@ -27,7 +27,7 @@ export default function MaintenanceCategoriesEdit({
     disabled_parent_ids,
 }: Props) {
     return (
-        <div className="container mx-auto max-w-3xl py-10">
+        <div className="w-full py-10">
             <Link
                 href={maintenanceCategories.index.url()}
                 className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"

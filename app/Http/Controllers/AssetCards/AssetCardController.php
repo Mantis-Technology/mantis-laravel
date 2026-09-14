@@ -9,6 +9,8 @@ use App\Models\AssetCard;
 use App\Models\AssetCardTemplate;
 use App\Services\AssetCardRules;
 use App\Services\BuildAssetCardData;
+use App\Services\GenerateAssetCardCode;
+use App\Services\GenerateAssetCardQrCode;
 use App\Services\TemplateSections;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,7 +26,9 @@ class AssetCardController extends Controller
     public function __construct(
         private TemplateSections $templateSections,
         private AssetCardRules $rules,
-        private BuildAssetCardData $buildData
+        private BuildAssetCardData $buildData,
+        private GenerateAssetCardCode $generateCode,
+        private GenerateAssetCardQrCode $qrCode
     ) {}
 
     public function index(): Response
@@ -88,7 +92,6 @@ class AssetCardController extends Controller
         $validated = $request->validate([
             'template_id' => ['required', 'integer', Rule::exists('asset_card_templates', 'id')],
             'version' => ['required', 'integer'],
-            'code' => ['required', 'string', 'max:255', Rule::unique('asset_cards', 'code')],
             'values' => ['array'],
         ]);
 
@@ -113,9 +116,11 @@ class AssetCardController extends Controller
         $assetCard = AssetCard::query()->create([
             'asset_card_template_id' => $template->id,
             'version' => $version,
-            'code' => (string) $validated['code'],
+            'code' => $this->generateCode->execute((string) tenant()?->name, $template),
             'data' => $this->buildData->execute($sections, $values),
         ]);
+
+        $this->qrCode->execute($assetCard);
 
         return redirect()
             ->route('asset-cards.show', $assetCard)
@@ -141,6 +146,8 @@ class AssetCardController extends Controller
             'sections' => $sections,
             'values' => $values,
             'fileUrls' => $this->fileUrls($assetCard, $sections, $values),
+            'qrUrl' => $this->qrUrl($assetCard),
+            'qrDownloadUrl' => $this->qrUrl($assetCard, download: true),
             'editUrl' => route('asset-cards.edit', $assetCard),
             'indexUrl' => route('asset-cards.index'),
         ]);
@@ -172,13 +179,7 @@ class AssetCardController extends Controller
 
     public function update(Request $request, AssetCard $assetCard): RedirectResponse
     {
-        $validated = $request->validate([
-            'code' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('asset_cards', 'code')->ignore($assetCard->id),
-            ],
+        $request->validate([
             'values' => ['array'],
         ]);
 
@@ -195,7 +196,6 @@ class AssetCardController extends Controller
         $this->ensureRequiredFiles($sections, $values);
 
         $assetCard->update([
-            'code' => (string) $validated['code'],
             'data' => $this->buildData->execute($sections, $values),
         ]);
 
@@ -399,6 +399,23 @@ class AssetCardController extends Controller
         }
 
         return $urls;
+    }
+
+    private function qrUrl(AssetCard $assetCard, bool $download = false): ?string
+    {
+        $path = $assetCard->qr_path;
+
+        if (! is_string($path) || $path === '') {
+            return null;
+        }
+
+        $parameters = ['assetCard' => $assetCard];
+
+        if ($download) {
+            $parameters['download'] = 1;
+        }
+
+        return route('asset-cards.qr', $parameters);
     }
 
     /**

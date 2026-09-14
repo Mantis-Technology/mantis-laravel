@@ -1,35 +1,35 @@
-import { FormEventHandler } from 'react'
-import { Head, useForm, usePage } from '@inertiajs/react'
+import { Head, useForm, usePage } from '@inertiajs/react';
+import type { FormEventHandler } from 'react';
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from '@/components/ui/card'
+} from '@/components/ui/card';
 
 type PageProps = {
     auth: {
         user: {
-            name: string
-            email: string
-        } | null
-    }
-    status?: string
-}
+            name: string;
+            email: string;
+        } | null;
+    };
+    status?: string;
+};
 
 export default function VerifyEmail() {
-    const { auth, status } = usePage<PageProps>().props
+    const { auth, status } = usePage<PageProps>().props;
 
-    const { post, processing } = useForm({})
+    const { post, processing } = useForm({});
 
     const submit: FormEventHandler = (event) => {
-        event.preventDefault()
+        event.preventDefault();
 
-        post('/email/verification-notification')
-    }
+        post('/email/verification-notification');
+    };
 
     return (
         <>
@@ -90,5 +90,5 @@ export default function VerifyEmail() {
                 </Card>
             </div>
         </>
-    )
+    );
 }

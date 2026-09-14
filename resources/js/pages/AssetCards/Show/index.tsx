@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { ArrowLeft, Pencil } from 'lucide-react';
+import { ArrowLeft, Download, Pencil, QrCode } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,8 @@ interface Props {
     sections: AssetCardTemplateSection[];
     values: AssetFormValues;
     fileUrls: AssetFileUrls;
+    qrUrl: string | null;
+    qrDownloadUrl: string | null;
     editUrl: string;
     indexUrl: string;
 }
@@ -59,11 +61,13 @@ export default function AssetCardsShow({
     sections,
     values,
     fileUrls,
+    qrUrl,
+    qrDownloadUrl,
     editUrl,
     indexUrl,
 }: Props) {
     return (
-        <div className="container mx-auto max-w-5xl py-10">
+        <div className="w-full py-10">
             <Link
                 href={indexUrl}
                 className="mb-6 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
@@ -92,6 +96,40 @@ export default function AssetCardsShow({
                     <Pencil /> Editar
                 </Button>
             </div>
+
+            {qrUrl && (
+                <Card className="mb-4">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <QrCode className="size-4" /> Código QR
+                        </CardTitle>
+
+                        <CardDescription>
+                            Escanealo para abrir esta ficha.
+                        </CardDescription>
+                    </CardHeader>
+
+                    <CardContent className="flex flex-wrap items-center gap-4">
+                        <img
+                            src={qrUrl}
+                            alt={`Código QR de ${assetCard.code}`}
+                            className="size-32 rounded-lg border bg-white p-1"
+                        />
+
+                        <Button
+                            variant="outline"
+                            render={
+                                <a
+                                    href={qrDownloadUrl ?? qrUrl}
+                                    download={`${assetCard.code}-qr.svg`}
+                                />
+                            }
+                        >
+                            <Download /> Descargar QR
+                        </Button>
+                    </CardContent>
+                </Card>
+            )}
 
             <div className="grid grid-cols-12 gap-4">
                 {sections.map((section) => {

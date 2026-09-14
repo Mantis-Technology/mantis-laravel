@@ -1,38 +1,38 @@
-import { FormEventHandler } from 'react'
-import { Head, Link, useForm, usePage } from '@inertiajs/react'
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import type { FormEventHandler } from 'react';
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 type ForgotPasswordForm = {
-    email: string
-}
+    email: string;
+};
 
 type PageProps = {
-    status?: string
-}
+    status?: string;
+};
 
 export default function ForgotPassword() {
-    const { status } = usePage<PageProps>().props
+    const { status } = usePage<PageProps>().props;
 
     const { data, setData, post, processing, errors } =
         useForm<ForgotPasswordForm>({
             email: '',
-        })
+        });
 
     const submit: FormEventHandler = (event) => {
-        event.preventDefault()
+        event.preventDefault();
 
-        post('/forgot-password')
-    }
+        post('/forgot-password');
+    };
 
     return (
         <>
@@ -44,17 +44,15 @@ export default function ForgotPassword() {
                         <CardTitle>Forgot your password?</CardTitle>
 
                         <CardDescription>
-                            Enter your email and we'll send you a password
-                            reset link.
+                            Enter your email and we'll send you a password reset
+                            link.
                         </CardDescription>
                     </CardHeader>
 
                     <CardContent>
                         <form onSubmit={submit} className="space-y-6">
                             <div className="space-y-2">
-                                <Label htmlFor="email">
-                                    Email
-                                </Label>
+                                <Label htmlFor="email">Email</Label>
 
                                 <Input
                                     id="email"
@@ -104,5 +102,5 @@ export default function ForgotPassword() {
                 </Card>
             </div>
         </>
-    )
+    );
 }

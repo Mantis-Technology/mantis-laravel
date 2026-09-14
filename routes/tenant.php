@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\AccessPortalController;
 use App\Http\Controllers\AssetCards\AssetCardController;
 use App\Http\Controllers\AssetCards\AssetCardFileController;
+use App\Http\Controllers\AssetCards\AssetCardQrController;
 use App\Http\Controllers\AssetCardTemplates\AssetCardTemplateBuilderController;
 use App\Http\Controllers\AssetCardTemplates\AssetCardTemplateController;
 use App\Http\Controllers\AssetCardTemplates\AssetCardTemplatePreviewController;
@@ -197,6 +198,9 @@ Route::middleware([
 
                     Route::get('/{assetCard}/files/{section}/{field}', AssetCardFileController::class)
                         ->name('files.show');
+
+                    Route::get('/{assetCard}/qr', AssetCardQrController::class)
+                        ->name('qr');
 
                     Route::put('/{assetCard}', [AssetCardController::class, 'update'])
                         ->name('update');
