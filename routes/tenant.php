@@ -12,6 +12,7 @@ use App\Http\Controllers\AssetCardTemplates\AssetCardTemplatePreviewController;
 use App\Http\Controllers\AssetCardTemplates\UpdateAssetCardTemplateSectionsController;
 use App\Http\Controllers\CompanyPortalController;
 use App\Http\Controllers\parameterization\MaintenanceCategoryController;
+use App\Http\Controllers\parameterization\LocationController;
 use App\Http\Controllers\permissions\PermissionController;
 use App\Http\Controllers\roles\RoleController;
 use App\Http\Controllers\TenantHomeController;
@@ -78,6 +79,33 @@ Route::middleware([
                     ->name('destroy');
 
                 Route::patch('/{id}/active', [MaintenanceCategoryController::class, 'toggleActive'])
+                    ->name('toggle-active')
+                    ->middleware('role:maintenance_chief|tenant_admin');
+            });
+
+            Route::group([
+                'prefix' => 'locations',
+                'as' => 'locations.',
+            ], function () {
+                Route::get('/', [LocationController::class, 'index'])
+                    ->name('index');
+
+                Route::get('/create', [LocationController::class, 'create'])
+                    ->name('create');
+
+                Route::post('/', [LocationController::class, 'store'])
+                    ->name('store');
+
+                Route::get('/{id}/edit', [LocationController::class, 'edit'])
+                    ->name('edit');
+
+                Route::put('/{id}', [LocationController::class, 'update'])
+                    ->name('update');
+
+                Route::delete('/{id}', [LocationController::class, 'destroy'])
+                    ->name('destroy');
+
+                Route::patch('/{id}/active', [LocationController::class, 'toggleActive'])
                     ->name('toggle-active')
                     ->middleware('role:maintenance_chief|tenant_admin');
             });

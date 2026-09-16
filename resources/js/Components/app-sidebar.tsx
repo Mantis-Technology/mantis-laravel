@@ -7,6 +7,7 @@ import {
     LayoutDashboardIcon,
     LayoutTemplateIcon,
     ListIcon,
+    MapPinIcon,
     UsersIcon,
     ShieldIcon,
     KeyRoundIcon,
@@ -69,6 +70,11 @@ const data = {
             title: 'Categorías de Mantenimiento',
             url: '/parameterization/maintenance-categories',
             icon: ListIcon,
+        },
+        {
+            title: 'Sedes y ubicaciones',
+            url: '/parameterization/locations',
+            icon: MapPinIcon,
         },
         {
             title: 'Plantillas de activos',
@@ -191,7 +197,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
                                     <CollapsibleContent>
                                         <SidebarMenuSub>
-                                            {data.administration.map((item) => (
+                                            {data.administration.map((item) =>(
                                                 <SidebarMenuSubItem
                                                     key={item.title}
                                                 >
