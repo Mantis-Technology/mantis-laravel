@@ -27,6 +27,7 @@ class TicketFactory extends Factory
         return [
             'reported_by' => User::factory(),
             'title' => fake()->sentence(6),
+            'description' => fake()->paragraph(),
             'status' => TicketStatus::Reported,
         ];
     }

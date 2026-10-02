@@ -1,5 +1,11 @@
 import { Link } from '@inertiajs/react';
-import { ArrowLeft, Download, Pencil, QrCode } from 'lucide-react';
+import {
+    AlertTriangle,
+    ArrowLeft,
+    Download,
+    Pencil,
+    QrCode,
+} from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,6 +17,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 
+import tickets from '@/routes/tickets';
 import type {
     AssetCardSummary,
     AssetFieldValue,
@@ -92,9 +99,24 @@ export default function AssetCardsShow({
                     </p>
                 </div>
 
-                <Button render={<Link href={editUrl} />}>
-                    <Pencil /> Editar
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        render={
+                            <Link
+                                href={tickets.create.url({
+                                    query: { asset: assetCard.code },
+                                })}
+                            />
+                        }
+                    >
+                        <AlertTriangle /> Reportar incidencia
+                    </Button>
+
+                    <Button render={<Link href={editUrl} />}>
+                        <Pencil /> Editar
+                    </Button>
+                </div>
             </div>
 
             {qrUrl && (
@@ -105,7 +127,8 @@ export default function AssetCardsShow({
                         </CardTitle>
 
                         <CardDescription>
-                            Escanealo para abrir esta ficha.
+                            Escanealo para abrir el reporte de incidencias de
+                            este activo.
                         </CardDescription>
                     </CardHeader>
 

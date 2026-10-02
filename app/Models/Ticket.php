@@ -11,18 +11,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
- * Skeleton of the maintenance ticket (REQ-11): links the reporting of an
- * incident to the subsequent maintenance management. Only defines the
- * structure and the 3 initial states (Reported → Categorized → Assigned);
- * full registration from the user's perspective is REQ-12, categorization
- * is REQ-13, and the complete lifecycle (in progress, closed, etc.) is
- * REQ-14.
+ * Maintenance ticket (REQ-12): a fault/incident report links the reporting
+ * of an incident to the subsequent maintenance management. A ticket is
+ * associated with its asset (asset card), the company (its tenant database),
+ * the reporter, and, optionally, the location where the problem occurred. It
+ * starts in the Reported state, ready for classification (REQ-13). The full
+ * lifecycle is REQ-14 and assignment is REQ-15.
  *
  * @property int $id
  * @property int $asset_card_id
  * @property int $reported_by
  * @property int|null $assigned_to
+ * @property int|null $location_id
  * @property string $title
+ * @property string|null $description
  * @property TicketStatus $status
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -31,7 +33,9 @@ use Illuminate\Support\Carbon;
     'asset_card_id',
     'reported_by',
     'assigned_to',
+    'location_id',
     'title',
+    'description',
     'status',
 ])]
 class Ticket extends Model
@@ -45,6 +49,7 @@ class Ticket extends Model
             'asset_card_id' => 'integer',
             'reported_by' => 'integer',
             'assigned_to' => 'integer',
+            'location_id' => 'integer',
             'status' => TicketStatus::class,
         ];
     }
@@ -63,6 +68,14 @@ class Ticket extends Model
     public function reporter(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reported_by');
+    }
+
+    /**
+     * @return BelongsTo<Location, $this>
+     */
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class);
     }
 
     /**
