@@ -46,4 +46,35 @@ class TicketFactory extends Factory
             'assigned_to' => User::factory(),
         ]);
     }
+
+    public function inProgress(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => TicketStatus::InProgress,
+            'assigned_to' => User::factory(),
+        ]);
+    }
+
+    public function resolved(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => TicketStatus::Resolved,
+            'assigned_to' => User::factory(),
+        ]);
+    }
+
+    public function closed(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => TicketStatus::Closed,
+            'assigned_to' => User::factory(),
+        ]);
+    }
+
+    public function cancelled(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => TicketStatus::Cancelled,
+        ]);
+    }
 }

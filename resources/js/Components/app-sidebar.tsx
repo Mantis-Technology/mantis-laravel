@@ -3,6 +3,7 @@ import {
     AlertTriangleIcon,
     BoxesIcon,
     ChevronRight,
+    ClipboardListIcon,
     CommandIcon,
     FolderIcon,
     LayoutDashboardIcon,
@@ -58,6 +59,11 @@ const data = {
             title: 'Dashboard',
             url: '/dashboard',
             icon: LayoutDashboardIcon,
+        },
+        {
+            title: 'Casos de mantenimiento',
+            url: '/tickets',
+            icon: ClipboardListIcon,
         },
         {
             title: 'Fichas de activos',
