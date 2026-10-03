@@ -11,12 +11,13 @@ use App\Http\Controllers\AssetCardTemplates\AssetCardTemplateController;
 use App\Http\Controllers\AssetCardTemplates\AssetCardTemplatePreviewController;
 use App\Http\Controllers\AssetCardTemplates\UpdateAssetCardTemplateSectionsController;
 use App\Http\Controllers\CompanyPortalController;
-use App\Http\Controllers\parameterization\MaintenanceCategoryController;
 use App\Http\Controllers\parameterization\LocationController;
+use App\Http\Controllers\parameterization\MaintenanceCategoryController;
 use App\Http\Controllers\permissions\PermissionController;
 use App\Http\Controllers\roles\RoleController;
 use App\Http\Controllers\TenantHomeController;
 use App\Http\Controllers\TenantLogoController;
+use App\Http\Controllers\tickets\TicketController;
 use App\Http\Controllers\users\UserController;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
@@ -51,6 +52,21 @@ Route::middleware([
             ->name('tenant.logo');
 
         Route::inertia('/dashboard', 'dashboard')->name('dashboard');
+
+        Route::get('/tickets', [TicketController::class, 'index'])
+            ->name('tickets.index');
+
+        Route::get('/tickets/create', [TicketController::class, 'create'])
+            ->name('tickets.create');
+
+        Route::post('/tickets', [TicketController::class, 'store'])
+            ->name('tickets.store');
+
+        Route::get('/tickets/{ticket}', [TicketController::class, 'show'])
+            ->name('tickets.show');
+
+        Route::patch('/tickets/{ticket}/status', [TicketController::class, 'updateStatus'])
+            ->name('tickets.status.update');
 
         Route::group([
             'prefix' => 'parameterization',

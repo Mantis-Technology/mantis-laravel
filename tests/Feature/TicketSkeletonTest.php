@@ -55,8 +55,11 @@ test('a new ticket is reported by default and belongs to its asset and reporter'
 });
 
 test('a ticket can transition forward one step at a time', function () {
+    $technician = User::factory()->create();
+
     $ticket = Ticket::factory()->create([
         'asset_card_id' => $this->assetCard->id,
+        'assigned_to' => $technician->id,
     ]);
 
     expect($ticket->transitionTo(TicketStatus::Categorized))->toBeNull();

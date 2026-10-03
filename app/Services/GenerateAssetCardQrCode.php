@@ -24,7 +24,7 @@ class GenerateAssetCardQrCode
      */
     public function execute(AssetCard $assetCard): ?string
     {
-        $svg = $this->render($assetCard->code);
+        $svg = $this->render($this->reportUrl($assetCard));
 
         if ($svg === null) {
             return null;
@@ -37,6 +37,15 @@ class GenerateAssetCardQrCode
         $assetCard->update(['qr_path' => $path]);
 
         return $path;
+    }
+
+    /**
+     * Points the QR at the incident report form for this asset, so scanning
+     * the QR code opens the report page with the asset already resolved.
+     */
+    public function reportUrl(AssetCard $assetCard): string
+    {
+        return route('tickets.create', ['asset' => $assetCard->code]);
     }
 
     private function render(string $content): ?string

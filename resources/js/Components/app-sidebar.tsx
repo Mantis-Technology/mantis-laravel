@@ -1,7 +1,9 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
+    AlertTriangleIcon,
     BoxesIcon,
     ChevronRight,
+    ClipboardListIcon,
     CommandIcon,
     FolderIcon,
     LayoutDashboardIcon,
@@ -59,9 +61,19 @@ const data = {
             icon: LayoutDashboardIcon,
         },
         {
+            title: 'Casos de mantenimiento',
+            url: '/tickets',
+            icon: ClipboardListIcon,
+        },
+        {
             title: 'Fichas de activos',
             url: '/asset-cards',
             icon: BoxesIcon,
+        },
+        {
+            title: 'Reportar incidencia',
+            url: '/tickets/create',
+            icon: AlertTriangleIcon,
         },
     ],
 
@@ -197,7 +209,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
                                     <CollapsibleContent>
                                         <SidebarMenuSub>
-                                            {data.administration.map((item) =>(
+                                            {data.administration.map((item) => (
                                                 <SidebarMenuSubItem
                                                     key={item.title}
                                                 >

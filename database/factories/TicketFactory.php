@@ -27,6 +27,7 @@ class TicketFactory extends Factory
         return [
             'reported_by' => User::factory(),
             'title' => fake()->sentence(6),
+            'description' => fake()->paragraph(),
             'status' => TicketStatus::Reported,
         ];
     }
@@ -43,6 +44,37 @@ class TicketFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => TicketStatus::Assigned,
             'assigned_to' => User::factory(),
+        ]);
+    }
+
+    public function inProgress(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => TicketStatus::InProgress,
+            'assigned_to' => User::factory(),
+        ]);
+    }
+
+    public function resolved(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => TicketStatus::Resolved,
+            'assigned_to' => User::factory(),
+        ]);
+    }
+
+    public function closed(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => TicketStatus::Closed,
+            'assigned_to' => User::factory(),
+        ]);
+    }
+
+    public function cancelled(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => TicketStatus::Cancelled,
         ]);
     }
 }

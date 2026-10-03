@@ -1,3 +1,4 @@
+name: mantis
 services:
     laravel.test:
         build:
