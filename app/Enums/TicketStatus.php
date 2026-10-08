@@ -101,4 +101,13 @@ enum TicketStatus: string
     {
         return in_array($this, [self::Assigned, self::InProgress], true);
     }
+
+    /**
+     * Statuses that require the case to be classified (REQ-13) before it can
+     * enter them.
+     */
+    public function requiresClassification(): bool
+    {
+        return $this === self::Categorized;
+    }
 }

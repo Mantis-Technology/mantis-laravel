@@ -1,11 +1,14 @@
 <?php
 
+use App\Enums\MaintenancePriority;
+use App\Enums\MaintenanceType;
 use App\Enums\Role;
 use App\Enums\TenantStatus;
 use App\Enums\TicketStatus;
 use App\Models\AssetCard;
 use App\Models\AssetCardTemplate;
 use App\Models\CardTemplateVersion;
+use App\Models\MaintenanceCategory;
 use App\Models\Tenant;
 use App\Models\Ticket;
 use App\Models\User;
@@ -66,6 +69,10 @@ beforeEach(function () {
         'code' => 'IDS-EC-100',
     ]);
 
+    $this->category = MaintenanceCategory::query()->create([
+        'name' => 'Eléctrica',
+    ]);
+
     $this->chief = User::factory()->create();
     $this->chief->assignRole(Role::MAINTENANCE_CHIEF->value);
 
@@ -90,7 +97,7 @@ test('a case follows the whole lifecycle one stage at a time', function () {
         'reported_by' => $this->operator->id,
     ]);
 
-    expect($ticket->transitionTo(TicketStatus::Categorized, $this->chief->id))->toBeNull();
+    expect($ticket->categorize($this->category, MaintenanceType::Corrective, MaintenancePriority::High, $this->chief->id))->toBeNull();
     expect($ticket->fresh()->status)->toBe(TicketStatus::Categorized);
 
     $ticket->assigned_to = $this->technician->id;
@@ -168,7 +175,13 @@ test('the lifecycle keeps an audit trail of every status change', function () {
         'reported_by' => $this->operator->id,
     ]);
 
-    $ticket->transitionTo(TicketStatus::Categorized, $this->chief->id, 'Falla electrica');
+    $ticket->categorize(
+        $this->category,
+        MaintenanceType::Corrective,
+        MaintenancePriority::High,
+        $this->chief->id,
+        'Falla electrica',
+    );
 
     $transitions = $ticket->statusTransitions()->with('changedBy')->get();
 
@@ -324,7 +337,7 @@ test('the case screen shows the status history and the allowed actions', functio
         'reported_by' => $this->operator->id,
     ]);
 
-    $ticket->transitionTo(TicketStatus::Categorized, $this->chief->id);
+    $ticket->categorize($this->category, MaintenanceType::Corrective, MaintenancePriority::High, $this->chief->id);
     $ticket->assigned_to = $this->technician->id;
     $ticket->save();
     $ticket->transitionTo(TicketStatus::Assigned, $this->chief->id);

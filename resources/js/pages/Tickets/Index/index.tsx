@@ -101,6 +101,7 @@ export default function TicketsIndex({ tickets, filters, statuses }: Props) {
                             <TableHead>Activo</TableHead>
                             <TableHead>Caso</TableHead>
                             <TableHead>Estado</TableHead>
+                            <TableHead>Prioridad</TableHead>
                             <TableHead>Reportado por</TableHead>
                             <TableHead>Responsable</TableHead>
                             <TableHead>Creado</TableHead>
@@ -133,6 +134,19 @@ export default function TicketsIndex({ tickets, filters, statuses }: Props) {
                                         />
                                     </TableCell>
 
+                                    <TableCell>
+                                        {ticket.priority ? (
+                                            <TicketStatusBadge
+                                                label={ticket.priority.label}
+                                                color={ticket.priority.color}
+                                            />
+                                        ) : (
+                                            <span className="text-muted-foreground">
+                                                Sin clasificar
+                                            </span>
+                                        )}
+                                    </TableCell>
+
                                     <TableCell className="text-muted-foreground">
                                         {ticket.reporter?.name ?? '—'}
                                     </TableCell>
@@ -157,7 +171,7 @@ export default function TicketsIndex({ tickets, filters, statuses }: Props) {
                         ) : (
                             <TableRow>
                                 <TableCell
-                                    colSpan={6}
+                                    colSpan={7}
                                     className="h-24 text-center"
                                 >
                                     No hay casos de mantenimiento.

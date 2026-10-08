@@ -1,9 +1,12 @@
 <?php
 
+use App\Enums\MaintenancePriority;
+use App\Enums\MaintenanceType;
 use App\Enums\TicketStatus;
 use App\Models\AssetCard;
 use App\Models\AssetCardTemplate;
 use App\Models\CardTemplateVersion;
+use App\Models\MaintenanceCategory;
 use App\Models\Ticket;
 use App\Models\User;
 
@@ -38,6 +41,10 @@ beforeEach(function () {
         'version' => 1,
         'code' => 'IDS-EC-001',
     ]);
+
+    $this->category = MaintenanceCategory::query()->create([
+        'name' => 'Eléctrica',
+    ]);
 });
 
 test('a new ticket is reported by default and belongs to its asset and reporter', function () {
@@ -61,6 +68,14 @@ test('a ticket can transition forward one step at a time', function () {
         'asset_card_id' => $this->assetCard->id,
         'assigned_to' => $technician->id,
     ]);
+
+    expect($ticket->transitionTo(TicketStatus::Categorized))->not->toBeNull();
+    expect($ticket->fresh()->status)->toBe(TicketStatus::Reported);
+
+    $ticket->maintenance_category_id = $this->category->id;
+    $ticket->maintenance_type = MaintenanceType::Corrective;
+    $ticket->priority = MaintenancePriority::High;
+    $ticket->save();
 
     expect($ticket->transitionTo(TicketStatus::Categorized))->toBeNull();
     expect($ticket->fresh()->status)->toBe(TicketStatus::Categorized);
