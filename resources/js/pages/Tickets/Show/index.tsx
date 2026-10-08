@@ -11,7 +11,13 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import ticketsRoutes from '@/routes/tickets';
-import type { TicketDetail, TicketUser } from '@/types/tickets/ticket';
+import type {
+    TicketDetail,
+    TicketMaintenanceCategoryOption,
+    TicketSlaTarget,
+    TicketStatusOption,
+    TicketUser,
+} from '@/types/tickets/ticket';
 
 import { StatusActions } from './partials/status-actions';
 import { StatusTimeline } from './partials/status-timeline';
@@ -19,6 +25,9 @@ import { StatusTimeline } from './partials/status-timeline';
 interface Props {
     ticket: TicketDetail;
     technicians: TicketUser[];
+    maintenance_categories: TicketMaintenanceCategoryOption[];
+    maintenance_types: TicketStatusOption[];
+    priorities: TicketStatusOption[];
 }
 
 const formatDate = (date: string | null) => {
@@ -30,6 +39,22 @@ const formatDate = (date: string | null) => {
         dateStyle: 'medium',
         timeStyle: 'short',
     }).format(new Date(date));
+};
+
+const formatHours = (hours: number) => {
+    const sign = hours < 0 ? '-' : '';
+    const absolute = Math.abs(hours);
+
+    if (absolute < 24) {
+        return `${sign}${absolute} h`;
+    }
+
+    const days = Math.floor(absolute / 24);
+    const remaining = Math.round(absolute % 24);
+
+    return remaining === 0
+        ? `${sign}${days} d`
+        : `${sign}${days} d ${remaining} h`;
 };
 
 function InfoRow({ label, children }: { label: string; children: ReactNode }) {
@@ -44,7 +69,65 @@ function InfoRow({ label, children }: { label: string; children: ReactNode }) {
     );
 }
 
-export default function TicketsShow({ ticket, technicians }: Props) {
+function SlaRow({ label, target }: { label: string; target: TicketSlaTarget }) {
+    return (
+        <div className="space-y-2 rounded-md border p-3">
+            <div className="flex items-center justify-between gap-2">
+                <span className="text-sm font-medium">{label}</span>
+
+                <TicketStatusBadge
+                    label={target.state_label}
+                    color={target.state_color}
+                />
+            </div>
+
+            <dl className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                <div>
+                    <dt>Objetivo</dt>
+                    <dd className="text-foreground">
+                        {formatHours(target.target_hours)}
+                    </dd>
+                </div>
+
+                <div>
+                    <dt>Vence</dt>
+                    <dd className="text-foreground">
+                        {formatDate(target.due_at)}
+                    </dd>
+                </div>
+
+                <div>
+                    <dt>Transcurrido</dt>
+                    <dd className="text-foreground">
+                        {formatHours(target.elapsed_hours)}
+                    </dd>
+                </div>
+
+                <div>
+                    <dt>{target.happened_at ? 'Resuelto en' : 'Restante'}</dt>
+                    <dd className="text-foreground">
+                        {target.happened_at
+                            ? formatDate(target.happened_at)
+                            : formatHours(target.remaining_hours)}
+                    </dd>
+                </div>
+            </dl>
+        </div>
+    );
+}
+
+export default function TicketsShow({
+    ticket,
+    technicians,
+    maintenance_categories,
+    maintenance_types,
+    priorities,
+}: Props) {
+    const hasClassification =
+        ticket.category !== null &&
+        ticket.maintenance_type !== null &&
+        ticket.priority !== null;
+
     return (
         <div className="w-full py-10">
             <Head title={`Caso #${ticket.id}`} />
@@ -108,6 +191,65 @@ export default function TicketsShow({ ticket, technicians }: Props) {
 
                     <Card>
                         <CardHeader>
+                            <CardTitle>Clasificación</CardTitle>
+
+                            <CardDescription>
+                                Categoría, tipo de mantenimiento y nivel de
+                                atención del caso.
+                            </CardDescription>
+                        </CardHeader>
+
+                        <CardContent className="space-y-6">
+                            {hasClassification ? (
+                                <dl className="grid gap-4 text-sm sm:grid-cols-2">
+                                    <InfoRow label="Categoría">
+                                        {ticket.category?.name ?? '—'}
+                                    </InfoRow>
+
+                                    <InfoRow label="Tipo de mantenimiento">
+                                        {ticket.maintenance_type && (
+                                            <TicketStatusBadge
+                                                label={
+                                                    ticket.maintenance_type
+                                                        .label
+                                                }
+                                                color={
+                                                    ticket.maintenance_type
+                                                        .color
+                                                }
+                                            />
+                                        )}
+                                    </InfoRow>
+
+                                    <InfoRow label="Prioridad">
+                                        {ticket.priority && (
+                                            <TicketStatusBadge
+                                                label={ticket.priority.label}
+                                                color={ticket.priority.color}
+                                            />
+                                        )}
+                                    </InfoRow>
+
+                                    <InfoRow label="Clasificado por">
+                                        {ticket.categorized_by?.name ?? '—'}
+                                    </InfoRow>
+
+                                    <InfoRow label="Fecha de clasificación">
+                                        {formatDate(ticket.categorized_at)}
+                                    </InfoRow>
+                                </dl>
+                            ) : (
+                                <p className="text-sm text-muted-foreground">
+                                    El caso aún no ha sido clasificado. Usa la
+                                    acción «Categorizar» para asignar su
+                                    categoría, tipo y nivel de atención.
+                                </p>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
                             <CardTitle>Historial de estados</CardTitle>
 
                             <CardDescription>
@@ -138,8 +280,44 @@ export default function TicketsShow({ ticket, technicians }: Props) {
                                 ticketId={ticket.id}
                                 transitions={ticket.allowed_transitions}
                                 technicians={technicians}
+                                maintenanceCategories={maintenance_categories}
+                                maintenanceTypes={maintenance_types}
+                                priorities={priorities}
                                 isFinal={ticket.is_final}
                             />
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Nivel de servicio</CardTitle>
+
+                            <CardDescription>
+                                Tiempo esperado para la atención del caso.
+                            </CardDescription>
+                        </CardHeader>
+
+                        <CardContent className="space-y-3">
+                            {ticket.sla.has_service_level &&
+                            ticket.sla.response &&
+                            ticket.sla.resolution ? (
+                                <>
+                                    <SlaRow
+                                        label="Tiempo de respuesta"
+                                        target={ticket.sla.response}
+                                    />
+
+                                    <SlaRow
+                                        label="Tiempo de resolución"
+                                        target={ticket.sla.resolution}
+                                    />
+                                </>
+                            ) : (
+                                <p className="text-sm text-muted-foreground">
+                                    No hay un nivel de servicio configurado para
+                                    la clasificación de este caso.
+                                </p>
+                            )}
                         </CardContent>
                     </Card>
 

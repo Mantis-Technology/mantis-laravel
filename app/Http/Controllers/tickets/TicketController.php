@@ -4,14 +4,19 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\tickets;
 
+use App\Dto\TicketSlaStatus;
+use App\Enums\MaintenancePriority;
+use App\Enums\MaintenanceType;
 use App\Enums\Role;
 use App\Enums\TicketStatus;
 use App\Http\Controllers\Controller;
 use App\Models\AssetCard;
 use App\Models\Location;
+use App\Models\MaintenanceCategory;
 use App\Models\Ticket;
 use App\Models\TicketStatusTransition;
 use App\Models\User;
+use App\Services\ResolveTicketServiceLevel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
@@ -23,6 +28,10 @@ use Inertia\Response;
 
 class TicketController extends Controller
 {
+    public function __construct(
+        private readonly ResolveTicketServiceLevel $serviceLevels,
+    ) {}
+
     /**
      * Lists the maintenance cases visible to the authenticated user. The
      * lifecycle state can be filtered through the `status` query parameter.
@@ -113,25 +122,37 @@ class TicketController extends Controller
             'location:id,name',
             'reporter:id,name',
             'assignee:id,name',
+            'maintenanceCategory:id,name',
+            'categorizedBy:id,name',
             'statusTransitions.changedBy:id,name',
         ]);
 
         return Inertia::render('Tickets/Show/index', [
             'ticket' => $this->ticketDetail($ticket, $user),
             'technicians' => $this->technicians(),
+            'maintenance_categories' => $this->maintenanceCategoryOptions(),
+            'maintenance_types' => $this->maintenanceTypeOptions(),
+            'priorities' => $this->priorityOptions(),
         ]);
     }
 
     /**
-     * Applies a lifecycle transition to the case. When moving to `assigned`,
-     * the responsible technician must be provided, so a case can never
-     * advance without an owner.
+     * Applies a lifecycle transition to the case. Moving to `categorized`
+     * requires the REQ-13 classification, and moving to `assigned` requires
+     * the responsible technician, so a case can never advance without the
+     * information its stage demands.
      */
     public function updateStatus(Request $request, Ticket $ticket): RedirectResponse
     {
         $user = $this->authenticatedUser($request);
 
         abort_unless($this->canViewTicket($user, $ticket), 403);
+
+        $requestedStatus = TicketStatus::tryFrom((string) $request->input('status'));
+
+        if ($requestedStatus !== null) {
+            abort_unless($this->canPerformTransition($user, $ticket, $requestedStatus), 403);
+        }
 
         $validated = $request->validate([
             'status' => ['required', Rule::enum(TicketStatus::class)],
@@ -142,6 +163,28 @@ class TicketController extends Controller
                 'nullable',
                 'integer',
                 Rule::exists('users', 'id')->whereNull('deleted_at'),
+            ],
+            'maintenance_category_id' => [
+                Rule::requiredIf(
+                    fn (): bool => $request->input('status') === TicketStatus::Categorized->value
+                ),
+                'nullable',
+                'integer',
+                Rule::exists('maintenance_categories', 'id')->where('is_active', true),
+            ],
+            'maintenance_type' => [
+                Rule::requiredIf(
+                    fn (): bool => $request->input('status') === TicketStatus::Categorized->value
+                ),
+                'nullable',
+                Rule::enum(MaintenanceType::class),
+            ],
+            'priority' => [
+                Rule::requiredIf(
+                    fn (): bool => $request->input('status') === TicketStatus::Categorized->value
+                ),
+                'nullable',
+                Rule::enum(MaintenancePriority::class),
             ],
             'note' => ['nullable', 'string', 'max:500'],
         ]);
@@ -156,15 +199,25 @@ class TicketController extends Controller
                 ->with('error', "No se puede pasar de '{$ticket->status->label()}' a '{$status->label()}'.");
         }
 
-        if ($status === TicketStatus::Assigned) {
-            $ticket->assigned_to = $this->technicianId((int) $validated['assigned_to']);
-        }
+        if ($status === TicketStatus::Categorized) {
+            $error = $ticket->categorize(
+                MaintenanceCategory::query()->findOrFail((int) $validated['maintenance_category_id']),
+                MaintenanceType::from($validated['maintenance_type']),
+                MaintenancePriority::from($validated['priority']),
+                $user->id,
+                $validated['note'] ?? null,
+            );
+        } else {
+            if ($status === TicketStatus::Assigned) {
+                $ticket->assigned_to = $this->technicianId((int) $validated['assigned_to']);
+            }
 
-        $error = $ticket->transitionTo(
-            $status,
-            $user->id,
-            $validated['note'] ?? null,
-        );
+            $error = $ticket->transitionTo(
+                $status,
+                $user->id,
+                $validated['note'] ?? null,
+            );
+        }
 
         if ($error !== null) {
             return redirect()
@@ -304,6 +357,16 @@ class TicketController extends Controller
             'status' => $ticket->status->value,
             'status_label' => $ticket->status->label(),
             'status_color' => $ticket->status->color(),
+            'maintenance_type' => $ticket->maintenance_type ? [
+                'value' => $ticket->maintenance_type->value,
+                'label' => $ticket->maintenance_type->label(),
+                'color' => $ticket->maintenance_type->color(),
+            ] : null,
+            'priority' => $ticket->priority ? [
+                'value' => $ticket->priority->value,
+                'label' => $ticket->priority->label(),
+                'color' => $ticket->priority->color(),
+            ] : null,
             'asset_card' => $ticket->assetCard ? [
                 'id' => $ticket->assetCard->id,
                 'code' => $ticket->assetCard->code,
@@ -331,6 +394,19 @@ class TicketController extends Controller
                 'id' => $ticket->location->id,
                 'name' => $ticket->location->name,
             ] : null,
+            'category' => $ticket->maintenanceCategory ? [
+                'id' => $ticket->maintenanceCategory->id,
+                'name' => $ticket->maintenanceCategory->name,
+            ] : null,
+            'categorized_by' => $ticket->categorizedBy ? [
+                'id' => $ticket->categorizedBy->id,
+                'name' => $ticket->categorizedBy->name,
+            ] : null,
+            'categorized_at' => $ticket->categorized_at?->toIso8601String(),
+            'sla' => TicketSlaStatus::fromTicket(
+                $ticket,
+                $this->serviceLevels->for($ticket),
+            )->toArray(),
             'updated_at' => $ticket->updated_at?->toIso8601String(),
             'is_final' => $ticket->status->isFinal(),
             'status_transitions' => $ticket->statusTransitions
@@ -391,6 +467,71 @@ class TicketController extends Controller
                 'color' => $status->color(),
             ],
             TicketStatus::cases(),
+        );
+    }
+
+    /**
+     * Active maintenance categories offered as the failure class when a case
+     * is classified (REQ-13), nested by parent for an indented select.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function maintenanceCategoryOptions(): array
+    {
+        $categories = MaintenanceCategory::query()
+            ->orderBy('name')
+            ->get(['id', 'name', 'parent_id']);
+
+        $childrenMap = $categories->groupBy(
+            fn (MaintenanceCategory $category) => $category->parent_id ?? 0
+        );
+
+        $build = function (array $parents) use (&$build, $childrenMap): array {
+            $nodes = [];
+
+            foreach ($parents as $category) {
+                $nodes[] = [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'children' => $build(
+                        $childrenMap->get($category->id, new Collection)->all()
+                    ),
+                ];
+            }
+
+            return $nodes;
+        };
+
+        return $build($childrenMap->get(0, new Collection)->all());
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function maintenanceTypeOptions(): array
+    {
+        return array_map(
+            fn (MaintenanceType $type): array => [
+                'value' => $type->value,
+                'label' => $type->label(),
+                'color' => $type->color(),
+            ],
+            MaintenanceType::cases(),
+        );
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function priorityOptions(): array
+    {
+        return array_map(
+            fn (MaintenancePriority $priority): array => [
+                'value' => $priority->value,
+                'label' => $priority->label(),
+                'color' => $priority->color(),
+            ],
+            MaintenancePriority::cases(),
         );
     }
 

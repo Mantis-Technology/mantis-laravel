@@ -6,6 +6,7 @@ import {
     ClipboardListIcon,
     CommandIcon,
     FolderIcon,
+    GaugeIcon,
     LayoutDashboardIcon,
     LayoutTemplateIcon,
     ListIcon,
@@ -87,6 +88,11 @@ const data = {
             title: 'Sedes y ubicaciones',
             url: '/parameterization/locations',
             icon: MapPinIcon,
+        },
+        {
+            title: 'Niveles de servicio',
+            url: '/parameterization/service-levels',
+            icon: GaugeIcon,
         },
         {
             title: 'Plantillas de activos',
