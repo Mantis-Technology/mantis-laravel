@@ -22,6 +22,7 @@ interface Props {
     tickets: TicketListItem[];
     filters: {
         status: string | null;
+        assigned: string | null;
     };
     statuses: TicketStatusOption[];
 }
@@ -38,13 +39,36 @@ const formatDate = (date: string | null) => {
 };
 
 export default function TicketsIndex({ tickets, filters, statuses }: Props) {
-    const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
-        const status = event.target.value;
+    const applyFilters = (next: {
+        status?: string | null;
+        assigned?: string | null;
+    }) => {
+        const status = next.status !== undefined ? next.status : filters.status;
+        const assigned =
+            next.assigned !== undefined ? next.assigned : filters.assigned;
 
-        router.get(ticketsRoutes.index.url(), status === '' ? {} : { status }, {
+        const params: Record<string, string> = {};
+
+        if (status) {
+            params.status = status;
+        }
+
+        if (assigned) {
+            params.assigned = assigned;
+        }
+
+        router.get(ticketsRoutes.index.url(), params, {
             preserveState: true,
             preserveScroll: true,
         });
+    };
+
+    const handleStatusChange = (event: ChangeEvent<HTMLSelectElement>) => {
+        applyFilters({ status: event.target.value });
+    };
+
+    const handleAssignedChange = (event: ChangeEvent<HTMLInputElement>) => {
+        applyFilters({ assigned: event.target.checked ? 'me' : null });
     };
 
     return (
@@ -70,28 +94,44 @@ export default function TicketsIndex({ tickets, filters, statuses }: Props) {
                 </Link>
             </div>
 
-            <div className="mb-4 flex items-center gap-2">
+            <div className="mb-4 flex flex-wrap items-center gap-4">
+                <div className="flex items-center gap-2">
+                    <label
+                        htmlFor="status"
+                        className="text-sm font-medium text-muted-foreground"
+                    >
+                        Estado
+                    </label>
+
+                    <select
+                        id="status"
+                        value={filters.status ?? ''}
+                        onChange={handleStatusChange}
+                        className="flex h-9 w-full max-w-56 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs ring-offset-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                    >
+                        <option value="">Todos los estados</option>
+
+                        {statuses.map((status) => (
+                            <option key={status.value} value={status.value}>
+                                {status.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
                 <label
-                    htmlFor="status"
-                    className="text-sm font-medium text-muted-foreground"
+                    htmlFor="assigned"
+                    className="flex items-center gap-2 text-sm font-medium text-muted-foreground"
                 >
-                    Estado
+                    <input
+                        id="assigned"
+                        type="checkbox"
+                        checked={filters.assigned === 'me'}
+                        onChange={handleAssignedChange}
+                        className="h-4 w-4 rounded border-input"
+                    />
+                    Solo mis casos
                 </label>
-
-                <select
-                    id="status"
-                    value={filters.status ?? ''}
-                    onChange={handleStatusChange}
-                    className="flex h-9 w-full max-w-56 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs ring-offset-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                >
-                    <option value="">Todos los estados</option>
-
-                    {statuses.map((status) => (
-                        <option key={status.value} value={status.value}>
-                            {status.label}
-                        </option>
-                    ))}
-                </select>
             </div>
 
             <div className="overflow-hidden rounded-md border">
