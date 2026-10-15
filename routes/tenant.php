@@ -69,6 +69,9 @@ Route::middleware([
         Route::patch('/tickets/{ticket}/status', [TicketController::class, 'updateStatus'])
             ->name('tickets.status.update');
 
+        Route::patch('/tickets/{ticket}/assignment', [TicketController::class, 'reassign'])
+            ->name('tickets.assignment.update');
+
         Route::group([
             'prefix' => 'parameterization',
             'as' => 'parameterization.',

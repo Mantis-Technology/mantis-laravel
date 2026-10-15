@@ -14,6 +14,7 @@ use App\Models\AssetCard;
 use App\Models\Location;
 use App\Models\MaintenanceCategory;
 use App\Models\Ticket;
+use App\Models\TicketAssignment;
 use App\Models\TicketStatusTransition;
 use App\Models\User;
 use App\Services\ResolveTicketServiceLevel;
@@ -34,19 +35,25 @@ class TicketController extends Controller
 
     /**
      * Lists the maintenance cases visible to the authenticated user. The
-     * lifecycle state can be filtered through the `status` query parameter.
+     * lifecycle state can be filtered through the `status` query parameter
+     * and the cases the user is responsible for through `assigned=me`.
      */
     public function index(Request $request): Response
     {
         $user = $this->authenticatedUser($request);
 
         $status = $this->statusFilter($request);
+        $assignedToMe = $request->query('assigned') === 'me';
 
         $tickets = $this->visibleTickets($user)
             ->with(['assetCard:id,code', 'reporter:id,name', 'assignee:id,name'])
             ->when(
                 $status !== null,
                 fn (Builder $query): Builder => $query->where('status', $status)
+            )
+            ->when(
+                $assignedToMe,
+                fn (Builder $query): Builder => $query->where('assigned_to', $user->id)
             )
             ->orderByDesc('created_at')
             ->get();
@@ -58,6 +65,7 @@ class TicketController extends Controller
                 ->all(),
             'filters' => [
                 'status' => $status?->value,
+                'assigned' => $assignedToMe ? 'me' : null,
             ],
             'statuses' => $this->statusOptions(),
         ]);
@@ -108,8 +116,8 @@ class TicketController extends Controller
     }
 
     /**
-     * Case detail: summary, lifecycle history and the transitions the
-     * authenticated user is allowed to perform.
+     * Case detail: summary, lifecycle history, assignment history and the
+     * transitions the authenticated user is allowed to perform.
      */
     public function show(Request $request, Ticket $ticket): Response
     {
@@ -125,6 +133,8 @@ class TicketController extends Controller
             'maintenanceCategory:id,name',
             'categorizedBy:id,name',
             'statusTransitions.changedBy:id,name',
+            'assignments.technician:id,name',
+            'assignments.assignedBy:id,name',
         ]);
 
         return Inertia::render('Tickets/Show/index', [
@@ -228,6 +238,47 @@ class TicketController extends Controller
         return redirect()
             ->route('tickets.show', $ticket)
             ->with('success', "El caso pasó a '{$status->label()}'.");
+    }
+
+    /**
+     * REQ-15: hands an already assigned (or in progress) case over to another
+     * technician. Only administrators and the maintenance chief can do it, and
+     * the previous responsibility stays in the assignment history.
+     */
+    public function reassign(Request $request, Ticket $ticket): RedirectResponse
+    {
+        $user = $this->authenticatedUser($request);
+
+        abort_unless($this->canManageAllCases($user), 403);
+
+        $validated = $request->validate([
+            'assigned_to' => [
+                'required',
+                'integer',
+                Rule::exists('users', 'id')->whereNull('deleted_at'),
+            ],
+            'note' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $technician = User::query()->findOrFail(
+            $this->technicianId((int) $validated['assigned_to'])
+        );
+
+        $error = $ticket->reassignTo(
+            $technician,
+            $user->id,
+            $validated['note'] ?? null,
+        );
+
+        if ($error !== null) {
+            return redirect()
+                ->route('tickets.show', $ticket)
+                ->with('error', $error);
+        }
+
+        return redirect()
+            ->route('tickets.show', $ticket)
+            ->with('success', "El caso fue reasignado a {$technician->name}.");
     }
 
     /**
@@ -427,6 +478,26 @@ class TicketController extends Controller
                 ->values()
                 ->all(),
             'allowed_transitions' => $this->transitionOptions($ticket, $user),
+            'assignments' => $ticket->assignments
+                ->map(fn (TicketAssignment $assignment): array => [
+                    'id' => $assignment->id,
+                    'technician' => $assignment->technician ? [
+                        'id' => $assignment->technician->id,
+                        'name' => $assignment->technician->name,
+                    ] : null,
+                    'assigned_by' => $assignment->assignedBy ? [
+                        'id' => $assignment->assignedBy->id,
+                        'name' => $assignment->assignedBy->name,
+                    ] : null,
+                    'assigned_at' => $assignment->assigned_at?->toIso8601String(),
+                    'ended_at' => $assignment->ended_at?->toIso8601String(),
+                    'is_active' => $assignment->isActive(),
+                    'note' => $assignment->note,
+                ])
+                ->values()
+                ->all(),
+            'can_reassign' => $this->canManageAllCases($user)
+                && in_array($ticket->status, [TicketStatus::Assigned, TicketStatus::InProgress], true),
         ];
     }
 

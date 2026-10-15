@@ -21,6 +21,9 @@ import type {
 
 import { StatusActions } from './partials/status-actions';
 import { StatusTimeline } from './partials/status-timeline';
+import { AssignmentHistory } from './partials/assignment-history';
+import { ReassignForm } from './partials/reassign-form';
+
 
 interface Props {
     ticket: TicketDetail;
@@ -262,7 +265,26 @@ export default function TicketsShow({
                                 transitions={ticket.status_transitions}
                             />
                         </CardContent>
+                    
                     </Card>
+                    
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Historial de responsables</CardTitle>
+
+                            <CardDescription>
+                                Técnicos que han tenido a cargo el caso.
+                            </CardDescription>
+                        </CardHeader>
+
+                        <CardContent>
+                            <AssignmentHistory
+                                assignments={ticket.assignments}
+                            />
+                        </CardContent>
+                    
+                    </Card>
+                
                 </div>
 
                 <div className="space-y-6">
@@ -287,6 +309,29 @@ export default function TicketsShow({
                             />
                         </CardContent>
                     </Card>
+
+                                        {ticket.can_reassign && (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Reasignar técnico</CardTitle>
+
+                                <CardDescription>
+                                    Cambia el responsable. El anterior queda en
+                                    el historial.
+                                </CardDescription>
+                            </CardHeader>
+
+                            <CardContent>
+                                <ReassignForm
+                                    ticketId={ticket.id}
+                                    technicians={technicians}
+                                    currentTechnicianId={
+                                        ticket.assignee?.id ?? null
+                                    }
+                                />
+                            </CardContent>
+                        </Card>
+                    )}
 
                     <Card>
                         <CardHeader>

@@ -84,4 +84,16 @@ export interface TicketDetail extends TicketListItem {
     sla: TicketSla;
     status_transitions: TicketStatusHistoryEntry[];
     allowed_transitions: TicketTransition[];
+    assignments: TicketAssignment[];
+    can_reassign: boolean;
+}
+
+export interface TicketAssignment {
+    id: number;
+    technician: TicketUser | null;
+    assigned_by: TicketUser | null;
+    assigned_at: string | null;
+    ended_at: string | null;
+    is_active: boolean;
+    note: string | null;
 }
