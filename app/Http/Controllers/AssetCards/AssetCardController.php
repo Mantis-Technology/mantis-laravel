@@ -9,6 +9,7 @@ use App\Models\AssetCard;
 use App\Models\AssetCardTemplate;
 use App\Services\AssetCardRules;
 use App\Services\BuildAssetCardData;
+use App\Services\BuildAssetCardHistory;
 use App\Services\GenerateAssetCardCode;
 use App\Services\GenerateAssetCardQrCode;
 use App\Services\TemplateSections;
@@ -28,7 +29,8 @@ class AssetCardController extends Controller
         private AssetCardRules $rules,
         private BuildAssetCardData $buildData,
         private GenerateAssetCardCode $generateCode,
-        private GenerateAssetCardQrCode $qrCode
+        private GenerateAssetCardQrCode $qrCode,
+        private BuildAssetCardHistory $history
     ) {}
 
     public function index(): Response
@@ -148,6 +150,7 @@ class AssetCardController extends Controller
             'fileUrls' => $this->fileUrls($assetCard, $sections, $values),
             'qrUrl' => $this->qrUrl($assetCard),
             'qrDownloadUrl' => $this->qrUrl($assetCard, download: true),
+            'history' => $this->history->execute($assetCard),
             'editUrl' => route('asset-cards.edit', $assetCard),
             'indexUrl' => route('asset-cards.index'),
         ]);

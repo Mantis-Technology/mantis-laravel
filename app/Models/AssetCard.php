@@ -55,4 +55,12 @@ class AssetCard extends Model
     {
         return $this->hasMany(PreventiveMaintenanceExecution::class);
     }
+
+    /**
+     * @return HasMany<Ticket, $this>
+     */
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class);
+    }
 }
