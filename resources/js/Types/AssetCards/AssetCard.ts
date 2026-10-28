@@ -36,3 +36,15 @@ export type AssetCardSummary = {
     id: number;
     code: string;
 };
+
+export type AssetHistoryItem = {
+    key: string;
+    type: 'ticket' | 'preventive';
+    title: string;
+    status_label: string;
+    status_color: string;
+    occurred_at: string | null;
+    has_time: boolean;
+    is_overdue: boolean;
+    url: string;
+};

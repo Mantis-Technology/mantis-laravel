@@ -23,12 +23,15 @@ import type {
     AssetFieldValue,
     AssetFileUrls,
     AssetFormValues,
+    AssetHistoryItem,
     AssetTemplateSummary,
 } from '@/Types/AssetCards/AssetCard';
 import type {
     AssetCardTemplateSection,
     TemplateField,
 } from '@/Types/AssetCardTemplates/AssetCardTemplate';
+
+import { AssetHistory } from './Partials/Asset-History';
 
 interface Props {
     assetCard: AssetCardSummary;
@@ -40,6 +43,7 @@ interface Props {
     qrDownloadUrl: string | null;
     editUrl: string;
     indexUrl: string;
+    history: AssetHistoryItem[];
 }
 
 function formatValue(field: TemplateField, value: AssetFieldValue): string {
@@ -72,6 +76,7 @@ export default function AssetCardsShow({
     qrDownloadUrl,
     editUrl,
     indexUrl,
+    history,
 }: Props) {
     return (
         <div className="w-full py-10">
@@ -229,6 +234,21 @@ export default function AssetCardsShow({
                     );
                 })}
             </div>
+
+            <Card className="mt-4">
+                <CardHeader>
+                    <CardTitle>Historial del activo</CardTitle>
+
+                    <CardDescription>
+                        Incidencias y mantenimientos preventivos, del más
+                        reciente al más antiguo (máximo 50).
+                    </CardDescription>
+                </CardHeader>
+
+                <CardContent>
+                    <AssetHistory items={history} />
+                </CardContent>
+            </Card>
         </div>
     );
 }
