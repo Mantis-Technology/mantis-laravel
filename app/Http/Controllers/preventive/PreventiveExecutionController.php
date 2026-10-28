@@ -50,7 +50,7 @@ class PreventiveExecutionController extends Controller
             ->orderBy('id')
             ->get();
 
-        return Inertia::render('PreventiveMaintenance/Executions/Index/index', [
+        return Inertia::render('PreventiveMaintenance/Executions/Index/Index', [
             'executions' => $executions
                 ->map(fn (PreventiveMaintenanceExecution $execution): array => $this->executionSummary($execution))
                 ->values()
@@ -70,7 +70,7 @@ class PreventiveExecutionController extends Controller
 
         abort_unless($this->canManage($user), 403);
 
-        return Inertia::render('PreventiveMaintenance/Executions/Create/index', [
+        return Inertia::render('PreventiveMaintenance/Executions/Create/Index', [
             'asset_cards' => $this->assetCards(),
             'maintenance_categories' => $this->maintenanceCategories(),
             'technicians' => $this->technicians(),
@@ -135,7 +135,7 @@ class PreventiveExecutionController extends Controller
             'statusTransitions.changedBy:id,name',
         ]);
 
-        return Inertia::render('PreventiveMaintenance/Executions/Show/index', [
+        return Inertia::render('PreventiveMaintenance/Executions/Show/Index', [
             'execution' => $this->executionDetail($execution, $user),
             'technicians' => $this->technicians(),
         ]);

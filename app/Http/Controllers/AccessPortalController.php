@@ -19,7 +19,7 @@ class AccessPortalController extends Controller
         $port = isset($appUrl['port']) ? ':'.$appUrl['port'] : '';
         $centralHost = config('tenancy.central_domains')[0];
 
-        return Inertia::render('access', [
+        return Inertia::render('Access', [
             'adminUrl' => $scheme.'://'.$centralHost.$port.'/admin',
         ]);
     }

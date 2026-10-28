@@ -52,7 +52,7 @@ class AssetCardTemplateBuilderController extends Controller
             ->values()
             ->all();
 
-        return Inertia::render('AssetCardTemplates/Builder/index', [
+        return Inertia::render('AssetCardTemplates/Builder/Index', [
             'template' => [
                 'id' => $template->id,
                 'name' => $template->name,

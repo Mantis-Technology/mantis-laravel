@@ -49,7 +49,7 @@ class PreventivePlanController extends Controller
             ->orderBy('title')
             ->get();
 
-        return Inertia::render('PreventiveMaintenance/Plans/Index/index', [
+        return Inertia::render('PreventiveMaintenance/Plans/Index/Index', [
             'plans' => $plans
                 ->map(fn (PreventiveMaintenancePlan $plan): array => $this->planSummary($plan))
                 ->values()
@@ -66,7 +66,7 @@ class PreventivePlanController extends Controller
 
         abort_unless($this->canManage($user), 403);
 
-        return Inertia::render('PreventiveMaintenance/Plans/Create/index', [
+        return Inertia::render('PreventiveMaintenance/Plans/Create/Index', [
             'asset_cards' => $this->assetCards(),
             'maintenance_categories' => $this->maintenanceCategories(),
             'technicians' => $this->technicians(),
@@ -160,7 +160,7 @@ class PreventivePlanController extends Controller
             ->limit(100)
             ->get();
 
-        return Inertia::render('PreventiveMaintenance/Plans/Show/index', [
+        return Inertia::render('PreventiveMaintenance/Plans/Show/Index', [
             'plan' => $this->planDetail($plan, $user, $executions->all()),
             'can_manage' => $this->canManage($user),
             'can_generate' => $this->canManage($user) && $plan->status === PreventivePlanStatus::Active,
@@ -180,7 +180,7 @@ class PreventivePlanController extends Controller
             'createdBy:id,name',
         ]);
 
-        return Inertia::render('PreventiveMaintenance/Plans/Edit/index', [
+        return Inertia::render('PreventiveMaintenance/Plans/Edit/Index', [
             'plan' => $this->planDetail($plan, $user, []),
             'maintenance_categories' => $this->maintenanceCategories(),
             'technicians' => $this->technicians(),

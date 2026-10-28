@@ -50,7 +50,7 @@ class AssetCardController extends Controller
             ->values()
             ->all();
 
-        return Inertia::render('AssetCards/index', [
+        return Inertia::render('AssetCards/Index', [
             'assetCards' => $assetCards,
             'createUrl' => route('asset-cards.create'),
             'templates' => $this->templatesWithVersions(),
@@ -75,7 +75,7 @@ class AssetCardController extends Controller
             return redirect()->route('asset-cards.index');
         }
 
-        return Inertia::render('AssetCards/Create/index', [
+        return Inertia::render('AssetCards/Create/Index', [
             'template' => [
                 'id' => $template->id,
                 'name' => $template->name,
@@ -133,7 +133,7 @@ class AssetCardController extends Controller
         $sections = $this->templateSections->forVersion($template, $assetCard->version);
         $values = $this->valuesFromData($assetCard->data);
 
-        return Inertia::render('AssetCards/Show/index', [
+        return Inertia::render('AssetCards/Show/Index', [
             'assetCard' => [
                 'id' => $assetCard->id,
                 'code' => $assetCard->code,
@@ -159,7 +159,7 @@ class AssetCardController extends Controller
         $sections = $this->templateSections->forVersion($template, $assetCard->version);
         $values = $this->valuesFromData($assetCard->data);
 
-        return Inertia::render('AssetCards/Edit/index', [
+        return Inertia::render('AssetCards/Edit/Index', [
             'assetCard' => [
                 'id' => $assetCard->id,
                 'code' => $assetCard->code,

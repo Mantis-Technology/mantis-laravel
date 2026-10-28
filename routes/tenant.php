@@ -54,7 +54,7 @@ Route::middleware([
         Route::get('/tenant/logo', TenantLogoController::class)
             ->name('tenant.logo');
 
-        Route::inertia('/dashboard', 'dashboard')->name('dashboard');
+        Route::inertia('/dashboard', 'Dashboard')->name('dashboard');
 
         Route::get('/tickets', [TicketController::class, 'index'])
             ->name('tickets.index');
@@ -340,6 +340,6 @@ Route::middleware([
                 });
         });
 
-        Route::inertia('/profile', 'Profile/edit')->name('profile.edit');
+        Route::inertia('/profile', 'Profile/Edit')->name('profile.edit');
     });
 });

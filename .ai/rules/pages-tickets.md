@@ -1,6 +1,6 @@
 ---
 paths:
-  - 'resources/js/pages/Tickets/**'
+  - 'resources/js/Pages/Tickets/**'
 ---
 
 # Pages Tickets

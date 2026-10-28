@@ -45,7 +45,7 @@ class FortifyServiceProvider extends ServiceProvider
     {
         Fortify::loginView(
             fn() =>
-            Inertia::render('Auth/login')
+            Inertia::render('Auth/Login')
         );
 
         Fortify::registerView(
@@ -55,11 +55,11 @@ class FortifyServiceProvider extends ServiceProvider
 
         Fortify::requestPasswordResetLinkView(
             fn() =>
-            Inertia::render('Auth/forgot-password')
+            Inertia::render('Auth/Forgot-Password')
         );
 
         Fortify::resetPasswordView(function (Request $request) {
-            return Inertia::render('Auth/reset-password', [
+            return Inertia::render('Auth/Reset-Password', [
                 'token' => $request->route('token'),
                 'email' => $request->email,
             ]);
@@ -67,7 +67,7 @@ class FortifyServiceProvider extends ServiceProvider
 
         Fortify::verifyEmailView(
             fn() =>
-            Inertia::render('Auth/verify-email')
+            Inertia::render('Auth/Verify-Email')
         );
     }
 

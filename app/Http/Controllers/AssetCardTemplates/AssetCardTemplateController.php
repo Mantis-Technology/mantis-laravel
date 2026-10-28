@@ -44,7 +44,7 @@ class AssetCardTemplateController extends Controller
             ->values()
             ->all();
 
-        return Inertia::render('AssetCardTemplates/index', [
+        return Inertia::render('AssetCardTemplates/Index', [
             'templates' => $templates,
             'createUrl' => route('asset-card-templates.create'),
         ]);
@@ -52,7 +52,7 @@ class AssetCardTemplateController extends Controller
 
     public function create(): Response
     {
-        return Inertia::render('AssetCardTemplates/Create/index', [
+        return Inertia::render('AssetCardTemplates/Create/Index', [
             'action' => route('asset-card-templates.store'),
             'indexUrl' => route('asset-card-templates.index'),
         ]);

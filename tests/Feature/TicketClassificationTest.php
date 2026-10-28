@@ -241,7 +241,7 @@ test('the case screen exposes the classification options and data', function () 
         ->get("http://{$this->tenant->id}.localhost/tickets/{$ticket->id}")
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('Tickets/Show/index')
+            ->component('Tickets/Show/Index')
             ->where('ticket.category.id', $this->category->id)
             ->where('ticket.category.name', 'Eléctrica')
             ->where('ticket.maintenance_type.value', MaintenanceType::Corrective->value)

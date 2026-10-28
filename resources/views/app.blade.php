@@ -11,7 +11,7 @@
         @fonts
 
         @viteReactRefresh
-        @vite(['resources/css/app.css', 'resources/js/app.tsx'])
+        @vite(['resources/css/app.css', 'resources/js/App.tsx'])
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
