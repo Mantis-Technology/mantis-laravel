@@ -2,6 +2,8 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     AlertTriangleIcon,
     BoxesIcon,
+    CalendarCheckIcon,
+    CalendarClockIcon,
     ChevronRight,
     ClipboardListIcon,
     CommandIcon,
@@ -75,6 +77,19 @@ const data = {
             title: 'Reportar incidencia',
             url: '/tickets/create',
             icon: AlertTriangleIcon,
+        },
+    ],
+
+    preventive: [
+        {
+            title: 'Planes preventivos',
+            url: '/preventive-plans',
+            icon: CalendarClockIcon,
+        },
+        {
+            title: 'Ejecuciones preventivas',
+            url: '/preventive-executions',
+            icon: CalendarCheckIcon,
         },
     ],
 
@@ -153,6 +168,45 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
             <SidebarContent>
                 <NavMain items={data.navMain} />
+
+                <SidebarGroup>
+                    <SidebarMenu>
+                        <Collapsible defaultOpen className="group/collapsible">
+                            <SidebarMenuItem>
+                                <CollapsibleTrigger
+                                    render={
+                                        <SidebarMenuButton tooltip="Mantenimiento preventivo" />
+                                    }
+                                >
+                                    <CalendarClockIcon className="size-4" />
+
+                                    <span>Mantenimiento preventivo</span>
+
+                                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                </CollapsibleTrigger>
+
+                                <CollapsibleContent>
+                                    <SidebarMenuSub>
+                                        {data.preventive.map((item) => (
+                                            <SidebarMenuSubItem
+                                                key={item.title}
+                                            >
+                                                <SidebarMenuSubButton
+                                                    render={
+                                                        <Link href={item.url} />
+                                                    }
+                                                >
+                                                    {item.icon && <item.icon />}
+                                                    <span>{item.title}</span>
+                                                </SidebarMenuSubButton>
+                                            </SidebarMenuSubItem>
+                                        ))}
+                                    </SidebarMenuSub>
+                                </CollapsibleContent>
+                            </SidebarMenuItem>
+                        </Collapsible>
+                    </SidebarMenu>
+                </SidebarGroup>
 
                 <SidebarGroup>
                     <SidebarMenu>
