@@ -11,6 +11,9 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/Http/Middleware/EnsureTenantIsActive.php | .ai/rules/middleware.md |
 | app/Models/Tenant.php, app/Models/Ticket.php, app/Models/ServiceLevel.php | .ai/rules/models.md |
 | resources/js/Pages/Tickets/** | .ai/rules/pages-tickets.md |
+| app/Http/Controllers/preventive/**, app/Services/PreventiveMaintenance/**, app/Models/Preventive* | .ai/rules/preventive-maintenance.md |
+| resources/js/Pages/PreventiveMaintenance/**, resources/js/Types/PreventiveMaintenance/**, resources/js/Lib/Preventive-Date.ts, resources/js/Lib/Form-Classes.ts | .ai/rules/pages-preventive.md |
+| app/Services/BuildAssetCardHistory.php, resources/js/Pages/AssetCards/Show/** | .ai/rules/asset-card-history.md |
 | app/Providers/TenancyServiceProvider.php | .ai/rules/providers.md |
 | routes/tenant.php | .ai/rules/routes.md |
 | app/Services/GenerateAssetCardQrCode.php | .ai/rules/services.md |
