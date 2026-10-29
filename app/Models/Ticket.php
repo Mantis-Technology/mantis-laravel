@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\MaintenancePriority;
 use App\Enums\MaintenanceType;
+use App\Enums\TicketClosureResult;
 use App\Enums\TicketStatus;
 use Database\Factories\TicketFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -255,6 +256,65 @@ class Ticket extends Model
         });
 
         return null;
+    }
+
+    /**
+     * Documented closure of the case (REQ-18); null until it is closed.
+     *
+     * @return HasOne<TicketClosure, $this>
+     */
+    public function closure(): HasOne
+    {
+        return $this->hasOne(TicketClosure::class);
+    }
+
+    /**
+     * Closes a resolved case (REQ-18): stores the documented closure and
+     * applies the Resolved -> Closed transition in a single transaction, so
+     * the case never ends up closed without its documentation. Returns an
+     * error message when the case cannot be closed, or null when it was.
+     */
+    public function close(
+        string $workPerformed,
+        TicketClosureResult $result,
+        ?string $observations = null,
+        ?int $closedBy = null,
+    ): ?string {
+        if ($this->status !== TicketStatus::Resolved) {
+            return "Solo se puede cerrar un caso en estado '".TicketStatus::Resolved->label()."'.";
+        }
+
+        if (trim($workPerformed) === '') {
+            return 'Debe documentar el trabajo realizado para cerrar el caso.';
+        }
+
+        $observations = $observations !== null && trim($observations) !== ''
+            ? trim($observations)
+            : null;
+
+        if ($result->requiresObservations() && $observations === null) {
+            return 'Las observaciones son obligatorias cuando el resultado incluye recomendaciones.';
+        }
+
+        $error = null;
+
+        DB::transaction(function () use ($workPerformed, $result, $observations, $closedBy, &$error): void {
+            $error = $this->transitionTo(TicketStatus::Closed, $closedBy);
+
+            if ($error !== null) {
+                return;
+            }
+
+            $this->closure()->create([
+                'work_performed' => trim($workPerformed),
+                'result' => $result,
+                'observations' => $observations,
+                'closed_by' => $closedBy,
+                'closed_at' => Carbon::now(),
+            ]);
+        });
+
+        return $error;
     }
 
     /**

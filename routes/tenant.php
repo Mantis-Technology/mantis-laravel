@@ -74,6 +74,9 @@ Route::middleware([
         Route::patch('/tickets/{ticket}/assignment', [TicketController::class, 'reassign'])
             ->name('tickets.assignment.update');
 
+        Route::post('/tickets/{ticket}/closure', [TicketController::class, 'close'])
+            ->name('tickets.closure.store');
+
         Route::prefix('preventive-plans')
             ->as('preventive-plans.')
             ->group(function () {

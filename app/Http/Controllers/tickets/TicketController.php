@@ -8,6 +8,7 @@ use App\Dto\TicketSlaStatus;
 use App\Enums\MaintenancePriority;
 use App\Enums\MaintenanceType;
 use App\Enums\Role;
+use App\Enums\TicketClosureResult;
 use App\Enums\TicketStatus;
 use App\Http\Controllers\Controller;
 use App\Models\AssetCard;
@@ -135,10 +136,12 @@ class TicketController extends Controller
             'statusTransitions.changedBy:id,name',
             'assignments.technician:id,name',
             'assignments.assignedBy:id,name',
+            'closure.closedBy:id,name',
         ]);
 
         return Inertia::render('Tickets/Show/Index', [
             'ticket' => $this->ticketDetail($ticket, $user),
+            'closure_results' => $this->closureResultOptions(),
             'technicians' => $this->technicians(),
             'maintenance_categories' => $this->maintenanceCategoryOptions(),
             'maintenance_types' => $this->maintenanceTypeOptions(),
@@ -157,6 +160,12 @@ class TicketController extends Controller
         $user = $this->authenticatedUser($request);
 
         abort_unless($this->canViewTicket($user, $ticket), 403);
+
+        if ($request->input('status') === TicketStatus::Closed->value) {
+            return redirect()
+                ->route('tickets.show', $ticket)
+                ->with('error', 'Para cerrar un caso debe documentar el cierre.');
+        }
 
         $requestedStatus = TicketStatus::tryFrom((string) $request->input('status'));
 
@@ -238,6 +247,53 @@ class TicketController extends Controller
         return redirect()
             ->route('tickets.show', $ticket)
             ->with('success', "El caso pasó a '{$status->label()}'.");
+    }
+
+    /**
+     * REQ-18: closes a resolved case documenting the work performed, the
+     * result and the observations for future interventions. Only
+     * administrators and the maintenance chief can close a case, and the
+     * closure is stored together with the transition to Closed.
+     */
+    public function close(Request $request, Ticket $ticket): RedirectResponse
+    {
+        $user = $this->authenticatedUser($request);
+
+        abort_unless($this->canViewTicket($user, $ticket), 403);
+        abort_unless($this->canManageAllCases($user), 403);
+
+        $validated = $request->validate([
+            'work_performed' => ['required', 'string', 'min:10', 'max:5000'],
+            'result' => ['required', Rule::enum(TicketClosureResult::class)],
+            'observations' => [
+                Rule::requiredIf(
+                    fn (): bool => $request->input('result') === TicketClosureResult::SolvedWithRecommendations->value
+                ),
+                'nullable',
+                'string',
+                'max:5000',
+            ],
+            'no_pending_actions' => ['accepted'],
+        ], [
+            'no_pending_actions.accepted' => 'Debe confirmar que no quedan acciones pendientes.',
+        ]);
+
+        $error = $ticket->close(
+            $validated['work_performed'],
+            TicketClosureResult::from($validated['result']),
+            $validated['observations'] ?? null,
+            $user->id,
+        );
+
+        if ($error !== null) {
+            return redirect()
+                ->route('tickets.show', $ticket)
+                ->with('error', $error);
+        }
+
+        return redirect()
+            ->route('tickets.show', $ticket)
+            ->with('success', 'El caso fue cerrado y su cierre quedó documentado.');
     }
 
     /**
@@ -382,6 +438,21 @@ class TicketController extends Controller
         ]);
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function closureResultOptions(): array
+    {
+        return array_map(
+            fn (TicketClosureResult $result): array => [
+                'value' => $result->value,
+                'label' => $result->label(),
+                'requires_observations' => $result->requiresObservations(),
+            ],
+            TicketClosureResult::cases(),
+        );
+    }
+
     private function technicianId(int $userId): int
     {
         $technician = User::query()
@@ -498,6 +569,20 @@ class TicketController extends Controller
                 ->all(),
             'can_reassign' => $this->canManageAllCases($user)
                 && in_array($ticket->status, [TicketStatus::Assigned, TicketStatus::InProgress], true),
+            'closure' => $ticket->closure ? [
+                'id' => $ticket->closure->id,
+                'work_performed' => $ticket->closure->work_performed,
+                'result' => $ticket->closure->result->value,
+                'result_label' => $ticket->closure->result->label(),
+                'observations' => $ticket->closure->observations,
+                'closed_by' => $ticket->closure->closedBy ? [
+                    'id' => $ticket->closure->closedBy->id,
+                    'name' => $ticket->closure->closedBy->name,
+                ] : null,
+                'closed_at' => $ticket->closure->closed_at->toIso8601String(),
+            ] : null,
+            'can_close' => $ticket->status === TicketStatus::Resolved
+                && $this->canManageAllCases($user),
         ];
     }
 
@@ -511,7 +596,8 @@ class TicketController extends Controller
     {
         $transitions = array_filter(
             $ticket->status->allowedTransitions(),
-            fn (TicketStatus $status): bool => $this->canPerformTransition($user, $ticket, $status),
+            fn (TicketStatus $status): bool => $status !== TicketStatus::Closed
+                && $this->canPerformTransition($user, $ticket, $status),
         );
 
         return array_values(array_map(
