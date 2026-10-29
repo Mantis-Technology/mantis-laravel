@@ -18,11 +18,14 @@ import type {
     TicketStatusOption,
     TicketUser,
 } from '@/Types/Tickets/Ticket';
+import type { TicketClosureResultOption } from '@/Types/Tickets/Closure';
 
 import { StatusActions } from './Partials/Status-Actions';
 import { StatusTimeline } from './Partials/Status-Timeline';
 import { AssignmentHistory } from './Partials/Assignment-History';
 import { ReassignForm } from './Partials/Reassign-Form';
+import { CloseForm } from './Partials/Close-Form';
+import { ClosureSummary } from './Partials/Closure-Summary';
 
 
 interface Props {
@@ -31,6 +34,7 @@ interface Props {
     maintenance_categories: TicketMaintenanceCategoryOption[];
     maintenance_types: TicketStatusOption[];
     priorities: TicketStatusOption[];
+    closure_results: TicketClosureResultOption[];
 }
 
 const formatDate = (date: string | null) => {
@@ -125,6 +129,7 @@ export default function TicketsShow({
     maintenance_categories,
     maintenance_types,
     priorities,
+    closure_results,
 }: Props) {
     const hasClassification =
         ticket.category !== null &&
@@ -162,6 +167,10 @@ export default function TicketsShow({
 
             <div className="grid gap-6 lg:grid-cols-3">
                 <div className="space-y-6 lg:col-span-2">
+                    {ticket.closure && (
+                        <ClosureSummary closure={ticket.closure} />
+                    )}
+
                     <Card>
                         <CardHeader>
                             <CardTitle>Detalle del caso</CardTitle>
@@ -310,7 +319,28 @@ export default function TicketsShow({
                         </CardContent>
                     </Card>
 
-                                        {ticket.can_reassign && (
+                                        {ticket.can_close && (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Cerrar caso</CardTitle>
+
+                                <CardDescription>
+                                    Documenta el trabajo y el resultado. El
+                                    cierre queda en el historial y no se puede
+                                    editar.
+                                </CardDescription>
+                            </CardHeader>
+
+                            <CardContent>
+                                <CloseForm
+                                    ticketId={ticket.id}
+                                    results={closure_results}
+                                />
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {ticket.can_reassign && (
                         <Card>
                             <CardHeader>
                                 <CardTitle>Reasignar técnico</CardTitle>
