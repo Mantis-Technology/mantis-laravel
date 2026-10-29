@@ -19,3 +19,4 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/Services/GenerateAssetCardQrCode.php | .ai/rules/services.md |
 | tests/** | .ai/rules/tests.md |
 | app/Http/Controllers/tickets/** | .ai/rules/tickets.md |
+| app/Enums/TicketClosureResult.php, app/Models/TicketClosure.php, resources/js/Pages/Tickets/Show/Partials/Close-Form.tsx, resources/js/Pages/Tickets/Show/Partials/Closure-Summary.tsx, resources/js/Types/Tickets/Closure.ts | .ai/rules/ticket-closure.md |

@@ -21,3 +21,5 @@ Ticket carries maintenance_category_id, maintenance_type (MaintenanceType enum),
 
 ## Service levels are wildcard rules resolved most-specific-first
 REQ-16: service_levels rows store response_hours and resolution_hours plus three optional dimensions (maintenance_category_id, maintenance_type, priority) where null means wildcard. is_active is a global scope: use withInactive()/onlyInactive() to include disabled rules. ResolveTicketServiceLevel::for($ticket) filters active rules with matches() and sorts by [-specificity(), id], returning the most specific rule or null. SLA is computed on read (app/Dto/TicketSlaStatus) from the ticket created_at plus the InProgress/Resolved transitions; there are no snapshot columns, so editing a rule retroactively changes compliance.
+
+REQ-18: in application code a case is closed through `Ticket::close()` (documented closure + `Resolved -> Closed` in one transaction), never by calling `transitionTo(Closed)` directly; `Ticket::closure()` is the HasOne to the immutable `TicketClosure`. See `.ai/rules/ticket-closure.md`.
