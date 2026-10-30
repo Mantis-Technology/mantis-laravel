@@ -346,7 +346,7 @@ test('the case screen shows the status history and the allowed actions', functio
         ->get("http://{$this->tenant->id}.localhost/tickets/{$ticket->id}")
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('Tickets/Show/index')
+            ->component('Tickets/Show/Index')
             ->where('ticket.status', TicketStatus::Assigned->value)
             ->where('ticket.status_label', 'Asignado')
             ->where('ticket.assignee.id', $this->technician->id)
@@ -379,7 +379,7 @@ test('the case list only shows the cases each user may see', function () {
         ->get($base)
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('Tickets/Index/index')
+            ->component('Tickets/Index/Index')
             ->has('tickets', 3)
         );
 

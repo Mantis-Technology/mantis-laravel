@@ -265,7 +265,7 @@ test('the case screen exposes the assignment history', function () {
         ->get("http://{$this->tenant->id}.localhost/tickets/{$ticket->id}")
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('Tickets/Show/index')
+            ->component('Tickets/Show/Index')
             ->has('ticket.assignments', 2)
             ->where('ticket.assignments.0.is_active', false)
             ->where('ticket.assignments.1.is_active', true)

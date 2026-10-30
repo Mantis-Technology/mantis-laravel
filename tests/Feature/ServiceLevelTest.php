@@ -204,7 +204,7 @@ test('the case screen computes the response and resolution targets', function ()
         ->get("http://{$this->tenant->id}.localhost/tickets/{$ticket->id}")
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('Tickets/Show/index')
+            ->component('Tickets/Show/Index')
             ->where('ticket.sla.has_service_level', true)
             ->where('ticket.sla.response.target_hours', 4)
             ->where('ticket.sla.response.state', 'met')
@@ -259,7 +259,7 @@ test('a maintenance chief manages the service levels', function () {
         ->get($base)
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('Parameterization/ServiceLevels/index')
+            ->component('Parameterization/ServiceLevels/Index')
             ->has('service_levels', 0)
             ->where('can_toggle_active', true)
         );
@@ -268,7 +268,7 @@ test('a maintenance chief manages the service levels', function () {
         ->get("{$base}/create")
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('Parameterization/ServiceLevels/Create/index')
+            ->component('Parameterization/ServiceLevels/Create/Index')
         );
 
     $this->actingAs($this->chief)

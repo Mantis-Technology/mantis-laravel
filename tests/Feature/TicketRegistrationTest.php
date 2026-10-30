@@ -81,7 +81,7 @@ test('the report form pre-resolves the asset when coming from its QR code', func
         ->get("http://{$this->tenant->id}.localhost/tickets/create?asset=IDS-EC-001");
 
     $response->assertOk()->assertInertia(fn (Assert $page) => $page
-        ->component('Tickets/Create/index')
+        ->component('Tickets/Create/Index')
         ->where('assetCard.id', $this->assetCard->id)
         ->where('assetCard.code', 'IDS-EC-001')
         ->has('assetCards', 0)
@@ -95,7 +95,7 @@ test('the report form lists the assets to choose from when no QR code is used', 
         ->get("http://{$this->tenant->id}.localhost/tickets/create");
 
     $response->assertOk()->assertInertia(fn (Assert $page) => $page
-        ->component('Tickets/Create/index')
+        ->component('Tickets/Create/Index')
         ->where('assetCard', null)
         ->has('assetCards', 1)
         ->where('assetCards.0.id', $this->assetCard->id)

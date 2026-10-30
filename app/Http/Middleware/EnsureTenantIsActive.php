@@ -38,7 +38,7 @@ class EnsureTenantIsActive
             $port = isset($appUrl['port']) ? ':'.$appUrl['port'] : '';
             $centralHost = (string) config('tenancy.central_domains')[0];
 
-            return Inertia::render('tenant-not-activated', [
+            return Inertia::render('Tenant-Not-Activated', [
                 'tenantName' => (string) $tenant->getAttribute('name'),
                 'centralUrl' => $scheme.'://'.$centralHost.$port.'/',
             ])

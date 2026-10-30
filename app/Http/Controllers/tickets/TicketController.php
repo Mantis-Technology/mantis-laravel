@@ -58,7 +58,7 @@ class TicketController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        return Inertia::render('Tickets/Index/index', [
+        return Inertia::render('Tickets/Index/Index', [
             'tickets' => $tickets
                 ->map(fn (Ticket $ticket): array => $this->ticketSummary($ticket))
                 ->values()
@@ -80,7 +80,7 @@ class TicketController extends Controller
     {
         $assetCard = $this->assetCardFromRequest($request);
 
-        return Inertia::render('Tickets/Create/index', [
+        return Inertia::render('Tickets/Create/Index', [
             'assetCard' => $assetCard
                 ? [
                     'id' => $assetCard->id,
@@ -137,7 +137,7 @@ class TicketController extends Controller
             'assignments.assignedBy:id,name',
         ]);
 
-        return Inertia::render('Tickets/Show/index', [
+        return Inertia::render('Tickets/Show/Index', [
             'ticket' => $this->ticketDetail($ticket, $user),
             'technicians' => $this->technicians(),
             'maintenance_categories' => $this->maintenanceCategoryOptions(),

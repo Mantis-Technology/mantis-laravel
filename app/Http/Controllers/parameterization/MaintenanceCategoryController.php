@@ -133,7 +133,7 @@ class MaintenanceCategoryController extends Controller
     public function index(Request $request): Response
     {
         return Inertia::render(
-            'Parameterization/MaintenanceCategories/index',
+            'Parameterization/MaintenanceCategories/Index',
             [
                 'maintenance_categories' => $this->canViewInactiveCategories()
                     ? $this->indexTree()
@@ -146,7 +146,7 @@ class MaintenanceCategoryController extends Controller
     public function create(): Response
     {
         return Inertia::render(
-            'Parameterization/MaintenanceCategories/Create/index',
+            'Parameterization/MaintenanceCategories/Create/Index',
             [
                 'action' => route(
                     'parameterization.maintenance-categories.store'
@@ -203,7 +203,7 @@ class MaintenanceCategoryController extends Controller
         ];
 
         return Inertia::render(
-            'Parameterization/MaintenanceCategories/Edit/index',
+            'Parameterization/MaintenanceCategories/Edit/Index',
             [
                 'maintenance_category' => $maintenanceCategory,
 
