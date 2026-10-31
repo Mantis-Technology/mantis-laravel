@@ -44,6 +44,7 @@ interface Props {
     editUrl: string;
     indexUrl: string;
     history: AssetHistoryItem[];
+    traceabilityUrl: string;
 }
 
 function formatValue(field: TemplateField, value: AssetFieldValue): string {
@@ -77,6 +78,7 @@ export default function AssetCardsShow({
     editUrl,
     indexUrl,
     history,
+    traceabilityUrl,
 }: Props) {
     return (
         <div className="w-full py-10">
@@ -246,7 +248,16 @@ export default function AssetCardsShow({
                 </CardHeader>
 
                 <CardContent>
-                    <AssetHistory items={history} />
+                    <div className="space-y-4">
+                        <AssetHistory items={history} />
+
+                        <Link
+                            href={traceabilityUrl}
+                            className="inline-block text-sm font-medium text-primary hover:underline"
+                        >
+                            Ver trazabilidad completa
+                        </Link>
+                    </div>
                 </CardContent>
             </Card>
         </div>
