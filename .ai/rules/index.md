@@ -14,6 +14,7 @@ Before planning or editing, find the row whose globs match the file's path and r
 | app/Http/Controllers/preventive/**, app/Services/PreventiveMaintenance/**, app/Models/Preventive* | .ai/rules/preventive-maintenance.md |
 | resources/js/Pages/PreventiveMaintenance/**, resources/js/Types/PreventiveMaintenance/**, resources/js/Lib/Preventive-Date.ts, resources/js/Lib/Form-Classes.ts | .ai/rules/pages-preventive.md |
 | app/Services/BuildAssetCardHistory.php, resources/js/Pages/AssetCards/Show/** | .ai/rules/asset-card-history.md |
+| app/Services/BuildAssetTraceability.php, app/Http/Controllers/AssetCards/AssetCardTraceabilityController.php, resources/js/Pages/AssetCards/Traceability/**, resources/js/Types/AssetCards/Traceability.ts | .ai/rules/asset-traceability.md |
 | app/Providers/TenancyServiceProvider.php | .ai/rules/providers.md |
 | routes/tenant.php | .ai/rules/routes.md |
 | app/Services/GenerateAssetCardQrCode.php | .ai/rules/services.md |
