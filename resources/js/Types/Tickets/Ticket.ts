@@ -1,5 +1,3 @@
-import type { TicketClosure } from './Closure';
-
 export interface TicketAssetCard {
     id: number;
     code: string;
@@ -88,8 +86,6 @@ export interface TicketDetail extends TicketListItem {
     allowed_transitions: TicketTransition[];
     assignments: TicketAssignment[];
     can_reassign: boolean;
-    closure: TicketClosure | null;
-    can_close: boolean;
 }
 
 export interface TicketAssignment {

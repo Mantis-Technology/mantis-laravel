@@ -62,7 +62,7 @@ export function StatusActions({
             <p className="text-sm text-muted-foreground">
                 {isFinal
                     ? 'El caso está en un estado final y ya no admite cambios.'
-                    : 'No hay acciones disponibles para este caso por ahora.'}
+                    : 'No tienes permisos para gestionar este caso.'}
             </p>
         );
     }
