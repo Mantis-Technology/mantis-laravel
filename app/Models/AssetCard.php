@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'asset_card_template_id',
@@ -37,5 +38,29 @@ class AssetCard extends Model
             ->where('asset_card_template_id', $this->asset_card_template_id)
             ->where('version', $this->version)
             ->firstOrFail();
+    }
+
+    /**
+     * @return HasMany<PreventiveMaintenancePlan, $this>
+     */
+    public function preventivePlans(): HasMany
+    {
+        return $this->hasMany(PreventiveMaintenancePlan::class);
+    }
+
+    /**
+     * @return HasMany<PreventiveMaintenanceExecution, $this>
+     */
+    public function preventiveExecutions(): HasMany
+    {
+        return $this->hasMany(PreventiveMaintenanceExecution::class);
+    }
+
+    /**
+     * @return HasMany<Ticket, $this>
+     */
+    public function tickets(): HasMany
+    {
+        return $this->hasMany(Ticket::class);
     }
 }

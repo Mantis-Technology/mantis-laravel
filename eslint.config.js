@@ -114,7 +114,7 @@ export default [
             'tailwind.config.js',
             'vite.config.ts',
             'resources/js/actions/**',
-            'resources/js/components/ui/*',
+            'resources/js/Components/Ui/*',
             'resources/js/routes/**',
             'resources/js/wayfinder/**',
         ],

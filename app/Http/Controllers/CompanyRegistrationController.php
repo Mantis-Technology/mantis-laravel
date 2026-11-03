@@ -20,7 +20,7 @@ class CompanyRegistrationController extends Controller
     {
         $appUrl = parse_url((string) config('app.url'));
 
-        return Inertia::render('tenant-register', [
+        return Inertia::render('Tenant-Register', [
             'domainBase' => config('tenancy.central_domains')[0],
             'scheme' => $appUrl['scheme'] ?? 'http',
             'port' => isset($appUrl['port']) ? ':'.$appUrl['port'] : '',
@@ -67,7 +67,7 @@ class CompanyRegistrationController extends Controller
     {
         $appUrl = parse_url((string) config('app.url'));
 
-        return Inertia::render('tenant-register-success', [
+        return Inertia::render('Tenant-Register-Success', [
             'domainBase' => config('tenancy.central_domains')[0],
             'scheme' => $appUrl['scheme'] ?? 'http',
             'port' => isset($appUrl['port']) ? ':'.$appUrl['port'] : '',

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\MaintenancePriority;
 use App\Enums\MaintenanceType;
+use App\Enums\TicketClosureResult;
 use App\Enums\TicketStatus;
 use Database\Factories\TicketFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -22,7 +24,8 @@ use Illuminate\Support\Facades\DB;
  * starts in the Reported state, ready for classification (REQ-13). REQ-14
  * owns the lifecycle: the allowed status flow and the audit trail of every
  * status change. REQ-13 classification (category, type, priority) is required
- * before the case can advance to Categorized. Assignment is REQ-15.
+ * before the case can advance to Categorized. Assignment is REQ-15: every
+ * responsible technician is kept in ticket_assignments with its period.
  *
  * @property int $id
  * @property int $asset_card_id
@@ -240,8 +243,146 @@ class Ticket extends Model
                 'changed_by' => $changedBy,
                 'note' => $note,
             ]);
+
+            // REQ-15: al asignar se abre la responsabilidad; al llegar a un
+            // estado final (cerrado o cancelado) se cierra.
+            if ($status === TicketStatus::Assigned) {
+                $this->openAssignment($changedBy, $note);
+            }
+
+            if ($status->isFinal()) {
+                $this->closeAssignment();
+            }
         });
 
         return null;
+    }
+
+    /**
+     * Documented closure of the case (REQ-18); null until it is closed.
+     *
+     * @return HasOne<TicketClosure, $this>
+     */
+    public function closure(): HasOne
+    {
+        return $this->hasOne(TicketClosure::class);
+    }
+
+    /**
+     * Closes a resolved case (REQ-18): stores the documented closure and
+     * applies the Resolved -> Closed transition in a single transaction, so
+     * the case never ends up closed without its documentation. Returns an
+     * error message when the case cannot be closed, or null when it was.
+     */
+    public function close(
+        string $workPerformed,
+        TicketClosureResult $result,
+        ?string $observations = null,
+        ?int $closedBy = null,
+    ): ?string {
+        if ($this->status !== TicketStatus::Resolved) {
+            return "Solo se puede cerrar un caso en estado '".TicketStatus::Resolved->label()."'.";
+        }
+
+        if (trim($workPerformed) === '') {
+            return 'Debe documentar el trabajo realizado para cerrar el caso.';
+        }
+
+        $observations = $observations !== null && trim($observations) !== ''
+            ? trim($observations)
+            : null;
+
+        if ($result->requiresObservations() && $observations === null) {
+            return 'Las observaciones son obligatorias cuando el resultado incluye recomendaciones.';
+        }
+
+        $error = null;
+
+        DB::transaction(function () use ($workPerformed, $result, $observations, $closedBy, &$error): void {
+            $error = $this->transitionTo(TicketStatus::Closed, $closedBy);
+
+            if ($error !== null) {
+                return;
+            }
+
+            $this->closure()->create([
+                'work_performed' => trim($workPerformed),
+                'result' => $result,
+                'observations' => $observations,
+                'closed_by' => $closedBy,
+                'closed_at' => Carbon::now(),
+            ]);
+        });
+
+        return $error;
+    }
+
+    /**
+     * Historial de responsables del caso, del más antiguo al más reciente
+     * (REQ-15).
+     *
+     * @return HasMany<TicketAssignment, $this>
+     */
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(TicketAssignment::class)
+            ->orderBy('assigned_at')
+            ->orderBy('id');
+    }
+
+    /**
+     * Asignación vigente (la que no tiene fecha de fin).
+     *
+     * @return HasOne<TicketAssignment, $this>
+     */
+    public function currentAssignment(): HasOne
+    {
+        return $this->hasOne(TicketAssignment::class)
+            ->whereNull('ended_at')
+            ->latest('assigned_at');
+    }
+
+    /**
+     * Cambia el técnico responsable sin cambiar el estado del caso (REQ-15).
+     * Cierra la asignación anterior y abre la nueva, conservando el
+     * historial. Devuelve un mensaje de error o null si se aplicó.
+     */
+    public function reassignTo(User $technician, ?int $changedBy = null, ?string $note = null): ?string
+    {
+        if (! in_array($this->status, [TicketStatus::Assigned, TicketStatus::InProgress], true)) {
+            return 'Solo se puede reasignar un caso asignado o en atención.';
+        }
+
+        if ($this->assigned_to === $technician->id) {
+            return 'El caso ya está asignado a ese técnico.';
+        }
+
+        DB::transaction(function () use ($technician, $changedBy, $note): void {
+            $this->closeAssignment();
+
+            $this->assigned_to = $technician->id;
+            $this->save();
+
+            $this->openAssignment($changedBy, $note);
+        });
+
+        return null;
+    }
+
+    private function openAssignment(?int $assignedBy, ?string $note): void
+    {
+        $this->assignments()->create([
+            'assigned_to' => $this->assigned_to,
+            'assigned_by' => $assignedBy,
+            'assigned_at' => Carbon::now(),
+            'note' => $note,
+        ]);
+    }
+
+    private function closeAssignment(): void
+    {
+        $this->assignments()
+            ->whereNull('ended_at')
+            ->update(['ended_at' => Carbon::now()]);
     }
 }

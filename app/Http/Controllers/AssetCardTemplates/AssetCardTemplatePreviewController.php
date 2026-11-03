@@ -36,7 +36,7 @@ class AssetCardTemplatePreviewController extends Controller
             ->values()
             ->all();
 
-        return Inertia::render('AssetCardTemplates/Preview/index', [
+        return Inertia::render('AssetCardTemplates/Preview/Index', [
             'template' => [
                 'id' => $template->id,
                 'name' => $template->name,

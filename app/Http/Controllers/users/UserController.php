@@ -20,7 +20,7 @@ class UserController extends Controller
     public function index(): Response
     {
         return Inertia::render(
-            'Users/index',
+            'Users/Index',
             [
                 'users' => User::withTrashed()
                     ->with('roles')
@@ -43,7 +43,7 @@ class UserController extends Controller
 
     public function create(): Response
     {
-        return Inertia::render('Users/Create/index', [
+        return Inertia::render('Users/Create/Index', [
             'action' => route('users.store'),
             'roles' => $this->rolesList(),
             'permissions' => $this->permissionsList(),
@@ -93,7 +93,7 @@ class UserController extends Controller
     {
         $user = User::withTrashed()->findOrFail($id);
 
-        return Inertia::render('Users/Edit/index', [
+        return Inertia::render('Users/Edit/Index', [
             'action' => route('users.update', $user->id),
             'user' => [
                 'id' => $user->id,

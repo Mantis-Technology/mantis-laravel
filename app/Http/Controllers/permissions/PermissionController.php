@@ -19,7 +19,7 @@ class PermissionController extends Controller
     public function index(): Response
     {
         return Inertia::render(
-            'Permissions/index',
+            'Permissions/Index',
             [
                 'permissions' => Permission::query()
                     ->orderBy('name')
@@ -38,7 +38,7 @@ class PermissionController extends Controller
 
     public function create(): Response
     {
-        return Inertia::render('Permissions/Create/index', [
+        return Inertia::render('Permissions/Create/Index', [
             'action' => route('permissions.store'),
         ]);
     }
@@ -68,7 +68,7 @@ class PermissionController extends Controller
     {
         $permission = Permission::findOrFail($id);
 
-        return Inertia::render('Permissions/Edit/index', [
+        return Inertia::render('Permissions/Edit/Index', [
             'action' => route('permissions.update', $permission->id),
             'permission' => [
                 'id' => $permission->id,

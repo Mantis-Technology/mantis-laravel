@@ -3,7 +3,7 @@ import createServer from '@inertiajs/react/server'
 import { renderToString } from 'react-dom/server'
 import type { ComponentType, ReactNode } from 'react'
 
-import AppLayout from '@/Layouts/app-layout'
+import AppLayout from '@/Layouts/App-Layout'
 
 type PageComponent = ComponentType<any> & {
     layout?: (page: ReactNode) => ReactNode

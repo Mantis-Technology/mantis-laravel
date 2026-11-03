@@ -9,6 +9,7 @@ use App\Models\AssetCard;
 use App\Models\AssetCardTemplate;
 use App\Services\AssetCardRules;
 use App\Services\BuildAssetCardData;
+use App\Services\BuildAssetCardHistory;
 use App\Services\GenerateAssetCardCode;
 use App\Services\GenerateAssetCardQrCode;
 use App\Services\TemplateSections;
@@ -28,7 +29,8 @@ class AssetCardController extends Controller
         private AssetCardRules $rules,
         private BuildAssetCardData $buildData,
         private GenerateAssetCardCode $generateCode,
-        private GenerateAssetCardQrCode $qrCode
+        private GenerateAssetCardQrCode $qrCode,
+        private BuildAssetCardHistory $history
     ) {}
 
     public function index(): Response
@@ -50,7 +52,7 @@ class AssetCardController extends Controller
             ->values()
             ->all();
 
-        return Inertia::render('AssetCards/index', [
+        return Inertia::render('AssetCards/Index', [
             'assetCards' => $assetCards,
             'createUrl' => route('asset-cards.create'),
             'templates' => $this->templatesWithVersions(),
@@ -75,7 +77,7 @@ class AssetCardController extends Controller
             return redirect()->route('asset-cards.index');
         }
 
-        return Inertia::render('AssetCards/Create/index', [
+        return Inertia::render('AssetCards/Create/Index', [
             'template' => [
                 'id' => $template->id,
                 'name' => $template->name,
@@ -133,7 +135,7 @@ class AssetCardController extends Controller
         $sections = $this->templateSections->forVersion($template, $assetCard->version);
         $values = $this->valuesFromData($assetCard->data);
 
-        return Inertia::render('AssetCards/Show/index', [
+        return Inertia::render('AssetCards/Show/Index', [
             'assetCard' => [
                 'id' => $assetCard->id,
                 'code' => $assetCard->code,
@@ -148,6 +150,7 @@ class AssetCardController extends Controller
             'fileUrls' => $this->fileUrls($assetCard, $sections, $values),
             'qrUrl' => $this->qrUrl($assetCard),
             'qrDownloadUrl' => $this->qrUrl($assetCard, download: true),
+            'history' => $this->history->execute($assetCard),
             'editUrl' => route('asset-cards.edit', $assetCard),
             'indexUrl' => route('asset-cards.index'),
         ]);
@@ -159,7 +162,7 @@ class AssetCardController extends Controller
         $sections = $this->templateSections->forVersion($template, $assetCard->version);
         $values = $this->valuesFromData($assetCard->data);
 
-        return Inertia::render('AssetCards/Edit/index', [
+        return Inertia::render('AssetCards/Edit/Index', [
             'assetCard' => [
                 'id' => $assetCard->id,
                 'code' => $assetCard->code,

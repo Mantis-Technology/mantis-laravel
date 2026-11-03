@@ -20,7 +20,7 @@ class RoleController extends Controller
     public function index(): Response
     {
         return Inertia::render(
-            'Roles/index',
+            'Roles/Index',
             [
                 'roles' => SpatieRole::query()
                     ->with('permissions')
@@ -43,7 +43,7 @@ class RoleController extends Controller
 
     public function create(): Response
     {
-        return Inertia::render('Roles/Create/index', [
+        return Inertia::render('Roles/Create/Index', [
             'action' => route('roles.store'),
             'permissions' => $this->permissionsList(),
         ]);
@@ -78,7 +78,7 @@ class RoleController extends Controller
     {
         $role = SpatieRole::findOrFail($id);
 
-        return Inertia::render('Roles/Edit/index', [
+        return Inertia::render('Roles/Edit/Index', [
             'action' => route('roles.update', $role->id),
             'role' => [
                 'id' => $role->id,

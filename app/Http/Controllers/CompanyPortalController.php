@@ -19,7 +19,7 @@ class CompanyPortalController extends Controller
         $port = isset($appUrl['port']) ? ':'.$appUrl['port'] : '';
         $baseDomain = config('tenancy.central_domains')[0];
 
-        return Inertia::render('company-portal', [
+        return Inertia::render('Company-Portal', [
             'domainBase' => $baseDomain,
             'scheme' => $scheme,
             'port' => $port,

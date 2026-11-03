@@ -118,7 +118,7 @@ class LocationController extends Controller
     public function index(Request $request): Response
     {
         return Inertia::render(
-            'Parameterization/Locations/index',
+            'Parameterization/Locations/Index',
             [
                 'locations' => $this->canViewInactiveLocations()
                     ? $this->indexTree()
@@ -131,7 +131,7 @@ class LocationController extends Controller
     public function create(): Response
     {
         return Inertia::render(
-            'Parameterization/Locations/Create/index',
+            'Parameterization/Locations/Create/Index',
             [
                 'action' => route('parameterization.locations.store'),
                 'parent_locations' => $this->parentLocations(),
@@ -174,7 +174,7 @@ class LocationController extends Controller
         ];
 
         return Inertia::render(
-            'Parameterization/Locations/Edit/index',
+            'Parameterization/Locations/Edit/Index',
             [
                 'location' => $location,
                 'action' => route('parameterization.locations.update', $location->id),

@@ -478,7 +478,7 @@ This is the single most important thing to get right — nearly everything lives
 
 - **Wayfinder route helpers are NOT committed.** `@laravel/vite-plugin-wayfinder` generates `resources/js/actions/`, `resources/js/routes/`, `resources/js/wayfinder/` (all gitignored) whenever Vite runs (`npm run dev` or `npm run build`). After adding/changing Laravel routes, regenerate them before relying on `@/actions` / `@/routes` imports; `php artisan route:list` alone won't refresh them. `formVariants: true` is enabled.
 - React **Compiler** is enabled (babel plugin in `vite.config.ts`) — follow its rules (no manual memo unless needed).
-- Tailwind v4 (CSS-first) with shadcn/ui primitives from `resources/js/components` (base-ui, `components.json`); prefill fields with `data-slot` attributes.
+- Tailwind v4 (CSS-first) with shadcn/ui primitives from `resources/js/Components` (base-ui, `components.json`); prefill fields with `data-slot` attributes.
 - `HandleInertiaRequests` shares `auth.user`, `tenant`, and **all `maintenance_categories`** as global props on every tenant request — be mindful of the eager-loaded query; don't duplicate it.
 
 ## Code conventions

@@ -6,6 +6,7 @@ use App\Http\Controllers\AccessPortalController;
 use App\Http\Controllers\AssetCards\AssetCardController;
 use App\Http\Controllers\AssetCards\AssetCardFileController;
 use App\Http\Controllers\AssetCards\AssetCardQrController;
+use App\Http\Controllers\AssetCards\AssetCardTraceabilityController;
 use App\Http\Controllers\AssetCardTemplates\AssetCardTemplateBuilderController;
 use App\Http\Controllers\AssetCardTemplates\AssetCardTemplateController;
 use App\Http\Controllers\AssetCardTemplates\AssetCardTemplatePreviewController;
@@ -15,6 +16,8 @@ use App\Http\Controllers\parameterization\LocationController;
 use App\Http\Controllers\parameterization\MaintenanceCategoryController;
 use App\Http\Controllers\parameterization\ServiceLevelController;
 use App\Http\Controllers\permissions\PermissionController;
+use App\Http\Controllers\preventive\PreventiveExecutionController;
+use App\Http\Controllers\preventive\PreventivePlanController;
 use App\Http\Controllers\roles\RoleController;
 use App\Http\Controllers\TenantHomeController;
 use App\Http\Controllers\TenantLogoController;
@@ -52,7 +55,7 @@ Route::middleware([
         Route::get('/tenant/logo', TenantLogoController::class)
             ->name('tenant.logo');
 
-        Route::inertia('/dashboard', 'dashboard')->name('dashboard');
+        Route::inertia('/dashboard', 'Dashboard')->name('dashboard');
 
         Route::get('/tickets', [TicketController::class, 'index'])
             ->name('tickets.index');
@@ -68,6 +71,62 @@ Route::middleware([
 
         Route::patch('/tickets/{ticket}/status', [TicketController::class, 'updateStatus'])
             ->name('tickets.status.update');
+
+        Route::patch('/tickets/{ticket}/assignment', [TicketController::class, 'reassign'])
+            ->name('tickets.assignment.update');
+
+        Route::prefix('preventive-plans')
+            ->as('preventive-plans.')
+            ->group(function () {
+                Route::get('/', [PreventivePlanController::class, 'index'])
+                    ->name('index');
+
+                Route::get('/create', [PreventivePlanController::class, 'create'])
+                    ->name('create');
+
+                Route::post('/', [PreventivePlanController::class, 'store'])
+                    ->name('store');
+
+                Route::get('/{plan}', [PreventivePlanController::class, 'show'])
+                    ->name('show');
+
+                Route::get('/{plan}/edit', [PreventivePlanController::class, 'edit'])
+                    ->name('edit');
+
+                Route::put('/{plan}', [PreventivePlanController::class, 'update'])
+                    ->name('update');
+
+                Route::patch('/{plan}/status', [PreventivePlanController::class, 'updateStatus'])
+                    ->name('status.update');
+
+                Route::post('/{plan}/occurrences', [PreventivePlanController::class, 'generateOccurrences'])
+                    ->name('occurrences.store');
+            });
+
+        Route::prefix('preventive-executions')
+            ->as('preventive-executions.')
+            ->group(function () {
+                Route::get('/', [PreventiveExecutionController::class, 'index'])
+                    ->name('index');
+
+                Route::get('/create', [PreventiveExecutionController::class, 'create'])
+                    ->name('create');
+
+                Route::post('/', [PreventiveExecutionController::class, 'store'])
+                    ->name('store');
+
+                Route::get('/{execution}', [PreventiveExecutionController::class, 'show'])
+                    ->name('show');
+
+                Route::patch('/{execution}/status', [PreventiveExecutionController::class, 'updateStatus'])
+                    ->name('status.update');
+
+                Route::patch('/{execution}/schedule', [PreventiveExecutionController::class, 'postpone'])
+                    ->name('schedule.update');
+
+                Route::patch('/{execution}/assignment', [PreventiveExecutionController::class, 'reassign'])
+                    ->name('assignment.update');
+            });
 
         Route::group([
             'prefix' => 'parameterization',
@@ -271,6 +330,9 @@ Route::middleware([
                     Route::get('/{assetCard}/files/{section}/{field}', AssetCardFileController::class)
                         ->name('files.show');
 
+                    Route::get('/{assetCard}/traceability', AssetCardTraceabilityController::class)
+                        ->name('traceability');
+
                     Route::get('/{assetCard}/qr', AssetCardQrController::class)
                         ->name('qr');
 
@@ -282,6 +344,6 @@ Route::middleware([
                 });
         });
 
-        Route::inertia('/profile', 'Profile/edit')->name('profile.edit');
+        Route::inertia('/profile', 'Profile/Edit')->name('profile.edit');
     });
 });
