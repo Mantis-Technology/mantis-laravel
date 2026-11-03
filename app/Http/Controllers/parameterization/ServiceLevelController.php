@@ -145,7 +145,11 @@ class ServiceLevelController extends Controller
 
     public function index(): Response
     {
+<<<<<<< HEAD
+        return Inertia::render('Parameterization/ServiceLevels/index', [
+=======
         return Inertia::render('Parameterization/ServiceLevels/Index', [
+>>>>>>> ee16555095020ee2e9c66be6abd063f39acf55ff
             'service_levels' => $this->serviceLevels($this->canViewInactive()),
             'can_toggle_active' => $this->canViewInactive(),
         ]);
@@ -153,7 +157,11 @@ class ServiceLevelController extends Controller
 
     public function create(): Response
     {
+<<<<<<< HEAD
+        return Inertia::render('Parameterization/ServiceLevels/Create/index', [
+=======
         return Inertia::render('Parameterization/ServiceLevels/Create/Index', [
+>>>>>>> ee16555095020ee2e9c66be6abd063f39acf55ff
             'action' => route('parameterization.service-levels.store'),
             'maintenance_categories' => $this->maintenanceCategoryOptions(),
             'maintenance_types' => $this->maintenanceTypeOptions(),
@@ -176,7 +184,11 @@ class ServiceLevelController extends Controller
     {
         $serviceLevel = ServiceLevel::query()->withInactive()->findOrFail($id);
 
+<<<<<<< HEAD
+        return Inertia::render('Parameterization/ServiceLevels/Edit/index', [
+=======
         return Inertia::render('Parameterization/ServiceLevels/Edit/Index', [
+>>>>>>> ee16555095020ee2e9c66be6abd063f39acf55ff
             'service_level' => $this->payload($serviceLevel),
             'action' => route('parameterization.service-levels.update', $serviceLevel->id),
             'maintenance_categories' => $this->maintenanceCategoryOptions(),
