@@ -2,9 +2,9 @@ import { Link } from '@inertiajs/react';
 import { ArrowLeft } from 'lucide-react';
 
 import serviceLevels from '@/routes/parameterization/service-levels';
-import type { ServiceLevel } from '@/types/maintenance/maintenance';
+import type { ServiceLevel } from '@/Types/Maintenance/Maintenance';
 
-import { ServiceLevelForm } from '../partials/form/service-level-form';
+import { ServiceLevelForm } from '../Partials/Form/Service-Level-Form';
 
 interface CategoryOption {
     id: number;

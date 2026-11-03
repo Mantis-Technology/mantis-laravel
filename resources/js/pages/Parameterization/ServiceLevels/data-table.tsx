@@ -8,10 +8,10 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '@/components/ui/table';
+} from '@/Components/Ui/Table';
 
-import { features } from './data-table-features';
-import type { DataTableFeatures } from './data-table-features';
+import { features } from './Data-Table-Features';
+import type { DataTableFeatures } from './Data-Table-Features';
 
 interface DataTableProps<TData extends RowData> {
     columns: ColumnDef<DataTableFeatures, TData>[];

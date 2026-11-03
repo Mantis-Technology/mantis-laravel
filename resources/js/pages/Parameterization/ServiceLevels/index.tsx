@@ -1,10 +1,10 @@
 import { Link, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 
-import type { ServiceLevel } from '@/types/maintenance/maintenance';
+import type { ServiceLevel } from '@/Types/Maintenance/Maintenance';
 
-import { buildColumns } from './columns';
-import { DataTable } from './data-table';
+import { buildColumns } from './Columns';
+import { DataTable } from './Data-Table';
 
 interface Props {
     [key: string]: unknown;

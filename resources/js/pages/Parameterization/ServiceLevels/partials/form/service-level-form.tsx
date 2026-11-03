@@ -3,17 +3,17 @@ import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/Components/Ui/Button';
 import {
     Field,
     FieldError,
     FieldGroup,
     FieldLabel,
-} from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
+} from '@/Components/Ui/Field';
+import { Input } from '@/Components/Ui/Input';
+import { Switch } from '@/Components/Ui/Switch';
 
-import type { ServiceLevel } from '@/types/maintenance/maintenance';
+import type { ServiceLevel } from '@/Types/Maintenance/Maintenance';
 
 interface CategoryOption {
     id: number;

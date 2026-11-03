@@ -2,11 +2,11 @@ import { Link, router } from '@inertiajs/react';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useState } from 'react';
 
-import { Switch } from '@/components/ui/switch';
+import { Switch } from '@/Components/Ui/Switch';
 import serviceLevels from '@/routes/parameterization/service-levels';
-import type { ServiceLevel } from '@/types/maintenance/maintenance';
+import type { ServiceLevel } from '@/Types/Maintenance/Maintenance';
 
-import type { DataTableFeatures } from './data-table-features';
+import type { DataTableFeatures } from './Data-Table-Features';
 
 const columnHelper = createColumnHelper<DataTableFeatures, ServiceLevel>();
 

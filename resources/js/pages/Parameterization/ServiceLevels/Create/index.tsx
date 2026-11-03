@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 
 import serviceLevels from '@/routes/parameterization/service-levels';
 
-import { ServiceLevelForm } from '../partials/form/service-level-form';
+import { ServiceLevelForm } from '../Partials/Form/Service-Level-Form';
 
 interface CategoryOption {
     id: number;
