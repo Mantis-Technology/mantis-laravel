@@ -151,6 +151,7 @@ class AssetCardController extends Controller
             'qrUrl' => $this->qrUrl($assetCard),
             'qrDownloadUrl' => $this->qrUrl($assetCard, download: true),
             'history' => $this->history->execute($assetCard),
+            'traceabilityUrl' => route('asset-cards.traceability', $assetCard),
             'editUrl' => route('asset-cards.edit', $assetCard),
             'indexUrl' => route('asset-cards.index'),
         ]);

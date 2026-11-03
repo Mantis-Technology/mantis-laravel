@@ -1,0 +1,13 @@
+{
+  "rows": 12000,
+  "columns": 20,
+  "assets": 500,
+  "tenants": 4,
+  "cutoffs": 24,
+  "cutoff_min": "2024-02-01",
+  "cutoff_max": "2026-01-01",
+  "positive_rows": 2939,
+  "positive_rate": 0.24491666666666667,
+  "target": "falla_30d",
+  "target_definition": "Falla correctiva en los 30 días posteriores al corte"
+}

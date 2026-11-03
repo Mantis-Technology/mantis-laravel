@@ -11,6 +11,7 @@ import { Badge } from '@/Components/Ui/Badge';
 import { Button } from '@/Components/Ui/Button';
 import {
     Card,
+    CardAction,
     CardContent,
     CardDescription,
     CardHeader,
@@ -44,6 +45,7 @@ interface Props {
     editUrl: string;
     indexUrl: string;
     history: AssetHistoryItem[];
+    traceabilityUrl: string;
 }
 
 function formatValue(field: TemplateField, value: AssetFieldValue): string {
@@ -77,6 +79,7 @@ export default function AssetCardsShow({
     editUrl,
     indexUrl,
     history,
+    traceabilityUrl,
 }: Props) {
     return (
         <div className="w-full py-10">
@@ -243,6 +246,16 @@ export default function AssetCardsShow({
                         Incidencias y mantenimientos preventivos, del más
                         reciente al más antiguo (máximo 50).
                     </CardDescription>
+
+                    <CardAction>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            render={<Link href={traceabilityUrl} />}
+                        >
+                            Ver trazabilidad completa
+                        </Button>
+                    </CardAction>
                 </CardHeader>
 
                 <CardContent>

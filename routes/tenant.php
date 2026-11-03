@@ -16,9 +16,11 @@ use App\Http\Controllers\parameterization\LocationController;
 use App\Http\Controllers\parameterization\MaintenanceCategoryController;
 use App\Http\Controllers\parameterization\ServiceLevelController;
 use App\Http\Controllers\permissions\PermissionController;
+use App\Http\Controllers\PredictiveRiskController;
 use App\Http\Controllers\preventive\PreventiveExecutionController;
 use App\Http\Controllers\preventive\PreventivePlanController;
 use App\Http\Controllers\roles\RoleController;
+use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\TenantHomeController;
 use App\Http\Controllers\TenantLogoController;
 use App\Http\Controllers\tickets\TicketController;
@@ -45,17 +47,21 @@ Route::middleware([
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
 
-    Route::get('/', TenantHomeController::class)->name('home');
+    Route::get('/', TenantHomeController::class)->name('tenant.home');
 
-    Route::get('/access', AccessPortalController::class)->name('access');
+    Route::get('/access', AccessPortalController::class)->name('tenant.access');
 
-    Route::get('/portal', CompanyPortalController::class)->name('portal');
+    Route::get('/portal', CompanyPortalController::class)->name('tenant.portal');
 
     Route::middleware('auth')->group(function () {
         Route::get('/tenant/logo', TenantLogoController::class)
             ->name('tenant.logo');
 
-        Route::inertia('/dashboard', 'Dashboard')->name('dashboard');
+        Route::get('/dashboard', [StatisticsController::class, 'index'])
+            ->name('dashboard');
+
+        Route::get('/dashboard/predictive-risk', [PredictiveRiskController::class, 'show'])
+            ->name('predictive-risk.show');
 
         Route::get('/tickets', [TicketController::class, 'index'])
             ->name('tickets.index');
