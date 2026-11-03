@@ -1,6 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import { AppSidebar } from '@/Components/App-Sidebar';
 import { FlashToasts } from '@/Components/Flash-Toasts';
+import { QrTicketScanner } from '@/Components/Tickets/Qr-Ticket-Scanner';
 import {
     SidebarInset,
     SidebarProvider,
@@ -20,6 +21,10 @@ export default function AppLayout({ children }: PropsWithChildren) {
             <SidebarInset>
                 <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
                     <SidebarTrigger />
+
+                    <div className="ml-auto">
+                        <QrTicketScanner />
+                    </div>
                 </header>
 
                 <main className="flex flex-1 flex-col gap-4 p-4">
