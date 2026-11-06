@@ -1,0 +1,39 @@
+{
+  "generated_at": "2026-11-03T21:26:30.490791+00:00",
+  "dataset": "data/processed/predictive_maintenance_dataset.csv",
+  "rows": 12000,
+  "positive_rate": 0.24491666666666667,
+  "best_model": "LogisticRegression",
+  "selection_strategy": "group_kfold_asset",
+  "threshold": 0.5,
+  "holdout_metrics": {
+    "precision": 0.4060734463276836,
+    "recall": 0.6748826291079812,
+    "f1": 0.5070546737213404,
+    "roc_auc": 0.6784797081683147,
+    "pr_auc": 0.46080806722030465
+  },
+  "group_kfold_metrics": {
+    "precision": 0.3580453347216387,
+    "recall": 0.6191691511477874,
+    "f1": 0.45354917604240697,
+    "roc_auc": 0.6664586722917238,
+    "pr_auc": 0.39687788571940763
+  },
+  "features": [
+    "tipo_activo",
+    "sede",
+    "criticidad",
+    "tipo_ultimo_mantenimiento",
+    "causa_ultima_falla",
+    "antiguedad_dias",
+    "fallas_90d",
+    "fallas_180d",
+    "dias_desde_ultimo_mantenimiento",
+    "dias_desde_ultima_falla",
+    "mtbf_dias",
+    "prioridad_promedio",
+    "resolucion_promedio_h"
+  ],
+  "model_path": "models/failure_risk_30d.joblib"
+}

@@ -11,6 +11,7 @@ import { Badge } from '@/Components/Ui/Badge';
 import { Button } from '@/Components/Ui/Button';
 import {
     Card,
+    CardAction,
     CardContent,
     CardDescription,
     CardHeader,
@@ -245,19 +246,20 @@ export default function AssetCardsShow({
                         Incidencias y mantenimientos preventivos, del más
                         reciente al más antiguo (máximo 50).
                     </CardDescription>
+
+                    <CardAction>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            render={<Link href={traceabilityUrl} />}
+                        >
+                            Ver trazabilidad completa
+                        </Button>
+                    </CardAction>
                 </CardHeader>
 
                 <CardContent>
-                    <div className="space-y-4">
-                        <AssetHistory items={history} />
-
-                        <Link
-                            href={traceabilityUrl}
-                            className="inline-block text-sm font-medium text-primary hover:underline"
-                        >
-                            Ver trazabilidad completa
-                        </Link>
-                    </div>
+                    <AssetHistory items={history} />
                 </CardContent>
             </Card>
         </div>
