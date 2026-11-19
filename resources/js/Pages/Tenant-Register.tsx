@@ -73,49 +73,51 @@ export default function TenantRegister() {
     };
 
     const inputClass = (hasError: boolean = false): string =>
-        `w-full border bg-[#121414] px-4 py-3 text-[16px] leading-[24px] text-[#e2e2e2] outline-none transition-colors placeholder:text-[#c0caaf]/50 focus:border-[#9cfb2b] ${
-            hasError ? 'border-[#ffb4ab]' : 'border-[#333535]'
+        `w-full border bg-background px-4 py-3 text-[16px] leading-[24px] text-foreground outline-none transition-colors placeholder:text-muted-foreground/50 focus:border-primary ${
+            hasError ? 'border-destructive' : 'border-border'
         }`;
 
     const labelClass =
-        'mb-1 block font-mono text-[12px] tracking-[0.05em] text-[#c0caaf] uppercase';
+        'mb-1 block font-mono text-[12px] tracking-[0.05em] text-muted-foreground uppercase';
 
-    const errorClass = 'mt-1 font-mono text-[12px] text-[#ffb4ab]';
+    const errorClass = 'mt-1 font-mono text-[12px] text-destructive';
 
     return (
         <div
             ref={rootRef}
-            className="flex min-h-svh flex-col bg-[#121414] text-[#e2e2e2]"
+            className="flex min-h-svh flex-col bg-background text-foreground"
         >
             <Head title="Registro de Empresas" />
 
-            <nav className="sticky top-0 z-50 mx-auto flex w-full max-w-[1440px] items-center justify-between border-b border-[#333535] bg-[#121414] px-6 py-4">
+            <div className="sticky top-0 z-50 w-full border-b border-white/10 bg-linear-to-r from-[#2c2d2e] to-[#3a3b3c] shadow-md">
+                <nav className="mx-auto flex w-full max-w-[1440px] items-center justify-between px-6 py-4">
                 <Link href="/" className="flex items-center gap-4">
                     <img
                         alt="MANTIS Industrial Logo"
-                        className="h-8 w-auto object-contain md:h-10"
+                        className="h-9 w-auto object-contain md:h-11"
                         src="/logo.png"
                     />
                 </Link>
 
                 <Link
                     href="/access"
-                    className="bg-[#9bfa2a] px-6 py-2 font-mono text-[14px] tracking-[0.05em] text-[#191919] uppercase transition-colors hover:bg-[#83dd00]"
+                    className="bg-primary px-6 py-2 font-mono text-[14px] tracking-[0.05em] text-primary-foreground uppercase transition-colors hover:bg-primary/85"
                 >
                     Acceder
                 </Link>
             </nav>
+            </div>
 
             <main className="mx-auto w-full max-w-[1440px] flex-1 px-6 py-16">
-                <div className="register-card mx-auto max-w-3xl border border-[#333535] bg-[#2A2A2A]">
-                    <div className="border-b border-[#333535] px-8 py-8 sm:px-10">
-                        <p className="mb-2 font-mono text-[12px] tracking-[0.05em] text-[#9cfb2b] uppercase">
+                <div className="register-card mx-auto max-w-3xl border border-border bg-card">
+                    <div className="border-b border-border px-8 py-8 sm:px-10">
+                        <p className="mb-2 font-mono text-[12px] tracking-[0.05em] text-accent-foreground dark:text-primary uppercase">
                             Onboarding / Empresas
                         </p>
-                        <h1 className="text-[32px] leading-[40px] font-bold tracking-[-0.01em] text-[#e2e2e2] uppercase">
+                        <h1 className="text-[32px] leading-[40px] font-bold tracking-[-0.01em] text-foreground uppercase">
                             Regístrese como empresa
                         </h1>
-                        <p className="mt-3 max-w-2xl text-[16px] leading-[24px] text-[#c0caaf]">
+                        <p className="mt-3 max-w-2xl text-[16px] leading-[24px] text-muted-foreground">
                             Complete la información legal y de contacto. Su
                             solicitud quedará en estado pendiente y será
                             revisada antes de su activación.
@@ -134,7 +136,7 @@ export default function TenantRegister() {
                             <button
                                 type="button"
                                 onClick={() => logoInputRef.current?.click()}
-                                className="flex w-full items-center justify-center gap-3 border border-dashed border-[#333535] bg-[#121414] px-4 py-6 transition-colors hover:border-[#9cfb2b]"
+                                className="flex w-full items-center justify-center gap-3 border border-dashed border-border bg-background px-4 py-6 transition-colors hover:border-primary"
                             >
                                 {logoPreview ? (
                                     <img
@@ -143,7 +145,7 @@ export default function TenantRegister() {
                                         className="max-h-20 object-contain"
                                     />
                                 ) : (
-                                    <span className="font-mono text-[14px] tracking-[0.05em] text-[#c0caaf] uppercase">
+                                    <span className="font-mono text-[14px] tracking-[0.05em] text-muted-foreground uppercase">
                                         Subir imagen de la empresa
                                     </span>
                                 )}
@@ -372,7 +374,7 @@ export default function TenantRegister() {
                         <div className="flex flex-col gap-4 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between sm:pt-4">
                             <Link
                                 href="/access"
-                                className="order-2 flex items-center justify-center gap-2 py-2 font-mono text-[14px] tracking-[0.05em] text-[#9cfb2b] uppercase transition-colors hover:underline sm:order-1"
+                                className="order-2 flex items-center justify-center gap-2 py-2 font-mono text-[14px] tracking-[0.05em] text-accent-foreground dark:text-primary uppercase transition-colors hover:underline sm:order-1"
                             >
                                 <span aria-hidden="true">←</span>
                                 Volver
@@ -381,7 +383,7 @@ export default function TenantRegister() {
                             <button
                                 type="submit"
                                 disabled={processing}
-                                className="order-1 flex w-full items-center justify-center gap-2 bg-[#9bfa2a] px-8 py-4 font-mono text-[14px] font-semibold tracking-[0.05em] text-[#191919] uppercase transition-colors hover:bg-[#83dd00] disabled:cursor-not-allowed disabled:opacity-60 sm:order-2 sm:w-auto"
+                                className="order-1 flex w-full items-center justify-center gap-2 bg-primary px-8 py-4 font-mono text-[14px] font-semibold tracking-[0.05em] text-primary-foreground uppercase transition-colors hover:bg-primary/85 disabled:cursor-not-allowed disabled:opacity-60 sm:order-2 sm:w-auto"
                             >
                                 {processing
                                     ? 'Enviando...'
@@ -392,12 +394,12 @@ export default function TenantRegister() {
                 </div>
             </main>
 
-            <footer className="border-t border-[#333535] bg-[#0c0f0f]">
+            <footer className="border-t border-border bg-muted">
                 <div className="mx-auto flex w-full max-w-[1440px] flex-col items-center justify-between gap-4 px-6 py-6 md:flex-row">
-                    <div className="font-mono text-[12px] font-bold text-[#e2e2e2]">
+                    <div className="font-mono text-[12px] font-bold text-foreground">
                         MANTIS
                     </div>
-                    <p className="font-mono text-[12px] text-[#c0caaf]">
+                    <p className="font-mono text-[12px] text-muted-foreground">
                         © 2024 MANTIS Industrial — Open Source / MIT
                     </p>
                 </div>

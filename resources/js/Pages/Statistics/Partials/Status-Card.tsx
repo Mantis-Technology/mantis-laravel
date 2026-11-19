@@ -19,7 +19,7 @@ const chartConfig = {} satisfies ChartConfig;
 
 const COLOR_MAP: Record<string, string> = {
     gray: 'var(--muted-foreground)',
-    info: '#0284c7',
+    info: 'var(--chart-1)',
     warning: '#d97706',
     success: '#059669',
     danger: 'var(--destructive)',

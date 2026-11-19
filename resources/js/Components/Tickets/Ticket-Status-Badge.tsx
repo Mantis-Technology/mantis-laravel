@@ -3,7 +3,7 @@ import { cn } from '@/Lib/Utils';
 
 const COLOR_CLASSES: Record<string, string> = {
     gray: 'bg-muted text-muted-foreground',
-    info: 'bg-sky-500/10 text-sky-700 dark:bg-sky-500/20 dark:text-sky-300',
+    info: 'bg-primary/10 text-brand-deep dark:bg-primary/20 dark:text-brand-2',
     warning:
         'bg-amber-500/15 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300',
     success:

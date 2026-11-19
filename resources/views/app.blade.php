@@ -8,6 +8,28 @@
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
+        {{-- Aplica el tema antes del primer paint para evitar el flash --}}
+        <script>
+            (function () {
+                try {
+                    var stored = localStorage.getItem('appearance') || 'light';
+                    var isDark =
+                        stored === 'dark' ||
+                        (stored === 'system' &&
+                            window.matchMedia(
+                                '(prefers-color-scheme: dark)',
+                            ).matches);
+
+                    document.documentElement.classList.toggle('dark', isDark);
+                    document.documentElement.style.colorScheme = isDark
+                        ? 'dark'
+                        : 'light';
+                } catch (error) {
+                    /* localStorage bloqueado: se queda en el tema por defecto */
+                }
+            })();
+        </script>
+
         @fonts
 
         @viteReactRefresh

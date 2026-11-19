@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react'
+import { Link, usePage } from '@inertiajs/react';
 
 import {
     SidebarGroup,
@@ -6,19 +6,23 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-} from '@/Components/Ui/Sidebar'
+} from '@/Components/Ui/Sidebar';
 
 type NavItem = {
-    title: string
-    url: string
-    icon?: React.ElementType
-}
+    title: string;
+    url: string;
+    icon?: React.ElementType;
+};
 
-export function NavMain({
-    items,
-}: {
-    items: NavItem[]
-}) {
+const isCurrentPath = (currentPath: string, href: string): boolean =>
+    href === '/dashboard'
+        ? currentPath === '/dashboard'
+        : currentPath === href || currentPath.startsWith(`${href}/`);
+
+export function NavMain({ items }: { items: NavItem[] }) {
+    const { url } = usePage();
+    const currentPath = url.split('?')[0];
+
     return (
         <SidebarGroup>
             <SidebarGroupContent>
@@ -27,6 +31,7 @@ export function NavMain({
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton
                                 tooltip={item.title}
+                                isActive={isCurrentPath(currentPath, item.url)}
                                 render={
                                     <Link
                                         href={item.url}
@@ -42,5 +47,5 @@ export function NavMain({
                 </SidebarMenu>
             </SidebarGroupContent>
         </SidebarGroup>
-    )
+    );
 }

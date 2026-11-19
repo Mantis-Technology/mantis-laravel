@@ -1,0 +1,65 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+/* Barra lateral carbón (igual que la app de los tenants) */
+.fi-sidebar {
+    background: linear-gradient(180deg, #3a3b3c 0%, #2c2d2e 100%);
+    border-color: transparent;
+}
+.fi-sidebar .fi-sidebar-header {
+    background: transparent;
+    box-shadow: none;
+    border-color: rgba(255, 255, 255, 0.08);
+}
+.fi-sidebar .fi-sidebar-item-label,
+.fi-sidebar .fi-sidebar-group-label,
+.fi-sidebar .fi-sidebar-group-btn {
+    color: #c9cbcc;
+}
+.fi-sidebar .fi-sidebar-item-icon {
+    color: #9da0a2;
+}
+.fi-sidebar .fi-sidebar-item-btn:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+.fi-sidebar .fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    background: rgba(255, 255, 255, 0.09);
+    box-shadow: inset 2px 0 0 #d98a6c;
+}
+.fi-sidebar .fi-sidebar-item.fi-active .fi-sidebar-item-label,
+.fi-sidebar .fi-sidebar-item.fi-active .fi-sidebar-item-icon {
+    color: #ffffff;
+}
+
+/* Fondo crema, tarjetas con sombra y encabezado de tabla con tinte */
+html:not(.dark) .fi-body {
+    background-color: #faf8f5;
+}
+.fi-section,
+.fi-ta-ctn {
+    box-shadow:
+        0 1px 2px rgba(52, 53, 54, 0.06),
+        0 10px 22px -16px rgba(52, 53, 54, 0.3);
+}
+html:not(.dark) .fi-ta-ctn thead th,
+html:not(.dark) .fi-ta-header-cell {
+    background-color: #f3e8e1;
+}
+
+/* Pantalla de inicio de sesión del panel */
+html:not(.dark) .fi-simple-layout {
+    background:
+        radial-gradient(55% 60% at 90% 0%, rgba(217, 138, 108, 0.22), transparent 70%),
+        radial-gradient(45% 55% at 0% 100%, rgba(47, 122, 130, 0.16), transparent 70%),
+        #faf8f5;
+}
+
+/* Barra superior carbón para que resalte el logo */
+.fi-topbar {
+    background: linear-gradient(90deg, #2c2d2e 0%, #3a3b3c 100%);
+    border-bottom: 3px solid transparent;
+    border-image: linear-gradient(90deg, #b85c43, #d98a6c 55%, #2f7a82) 1;
+    box-shadow: none;
+}

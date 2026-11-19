@@ -2,6 +2,7 @@ import type { PropsWithChildren } from 'react';
 import { AppSidebar } from '@/Components/App-Sidebar';
 import { FlashToasts } from '@/Components/Flash-Toasts';
 import { QrTicketScanner } from '@/Components/Tickets/Qr-Ticket-Scanner';
+import { ThemeToggle } from '@/Components/Ui/Theme-Toggle';
 import {
     SidebarInset,
     SidebarProvider,
@@ -19,10 +20,11 @@ export default function AppLayout({ children }: PropsWithChildren) {
             <FlashToasts />
 
             <SidebarInset>
-                <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+                <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b bg-card px-4">
                     <SidebarTrigger />
 
-                    <div className="ml-auto">
+                    <div className="ml-auto flex items-center gap-2">
+                        <ThemeToggle />
                         <QrTicketScanner />
                     </div>
                 </header>

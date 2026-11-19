@@ -136,7 +136,11 @@ const data = {
 };
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
-    const { tenant, auth } = usePage<PageProps>().props;
+    const page = usePage<PageProps>();
+    const { tenant, auth } = page.props;
+    const currentPath = page.url.split('?')[0];
+    const isActive = (href: string): boolean =>
+        currentPath === href || currentPath.startsWith(`${href}/`);
     const showAdministration = isTenantAdmin(auth.user);
 
     return (
@@ -155,7 +159,9 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                                     className="aspect-video w-full max-w-40 object-contain"
                                 />
                             ) : (
-                                <CommandIcon className="size-10!" />
+                                <div className="flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+                                    <CommandIcon className="size-6!" />
+                                </div>
                             )}
 
                             <span className="w-full truncate text-center text-base font-semibold">
@@ -192,6 +198,9 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                                                 key={item.title}
                                             >
                                                 <SidebarMenuSubButton
+                                                    isActive={isActive(
+                                                        item.url,
+                                                    )}
                                                     render={
                                                         <Link href={item.url} />
                                                     }
@@ -231,6 +240,9 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                                                 key={item.title}
                                             >
                                                 <SidebarMenuSubButton
+                                                    isActive={isActive(
+                                                        item.url,
+                                                    )}
                                                     render={
                                                         <Link href={item.url} />
                                                     }
@@ -274,6 +286,9 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                                                     key={item.title}
                                                 >
                                                     <SidebarMenuSubButton
+                                                        isActive={isActive(
+                                                            item.url,
+                                                        )}
                                                         render={
                                                             <Link
                                                                 href={item.url}
