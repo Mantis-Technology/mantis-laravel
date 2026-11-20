@@ -41,7 +41,7 @@ COPY . .
 RUN php artisan package:discover --ansi \
     && php artisan filament:upgrade
 
-RUN npm ci && npm run build
+RUN npm ci --include=dev && npm run build
 
 COPY docker/nginx.conf /etc/nginx/sites-available/default
 COPY docker/start.sh /usr/local/bin/start.sh
