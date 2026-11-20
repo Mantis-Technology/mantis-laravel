@@ -39,9 +39,11 @@ export default function Login() {
         <>
             <Head title="Iniciar sesión" />
 
-            <div className="flex min-h-svh items-center justify-center bg-muted/40 p-6">
-                <Card className="w-full max-w-md">
-                    <CardHeader className="space-y-1">
+            <div className="flex min-h-svh items-center justify-center bg-background p-6">
+                <Card className="relative w-full max-w-md overflow-hidden">
+                    <div className="absolute inset-x-0 top-0 h-1 bg-primary" />
+
+                    <CardHeader className="space-y-1 pt-6">
                         <CardTitle className="text-2xl">
                             Bienvenido de nuevo
                         </CardTitle>
@@ -83,7 +85,7 @@ export default function Login() {
 
                                     <Link
                                         href="/forgot-password"
-                                        className="text-sm font-medium underline-offset-4 hover:underline"
+                                        className="text-sm font-medium text-primary underline-offset-4 hover:underline"
                                     >
                                         ¿Olvidaste tu contraseña?
                                     </Link>

@@ -57,7 +57,7 @@ export function NavUser() {
             render={
               <SidebarMenuButton
                 size="lg"
-                className="aria-expanded:bg-muted"
+                className="aria-expanded:bg-sidebar-accent"
               />
             }
           >
@@ -79,7 +79,7 @@ export function NavUser() {
                 {user.name}
               </span>
 
-              <span className="truncate text-xs text-foreground/70">
+              <span className="truncate text-xs text-sidebar-foreground/70">
                 {user.email}
               </span>
             </div>

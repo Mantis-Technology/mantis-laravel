@@ -1,6 +1,7 @@
 import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/react';
+import { ThemeProvider } from 'next-themes';
 import type { ComponentType, ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 
@@ -52,6 +53,15 @@ createInertiaApp({
     },
 
     setup({ el, App, props }) {
-        createRoot(el).render(<App {...props} />);
+        createRoot(el).render(
+            <ThemeProvider
+                attribute="class"
+                defaultTheme="light"
+                enableSystem
+                storageKey="appearance"
+            >
+                <App {...props} />
+            </ThemeProvider>,
+        );
     },
 });
