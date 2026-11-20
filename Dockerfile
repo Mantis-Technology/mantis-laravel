@@ -1,4 +1,4 @@
-FROM php:8.3-fpm-bookworm
+FROM php:8.4-fpm-bookworm
 
 ENV COMPOSER_ALLOW_SUPERUSER=1 \
     NODE_ENV=production
