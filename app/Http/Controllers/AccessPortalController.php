@@ -15,9 +15,21 @@ class AccessPortalController extends Controller
     {
         $appUrl = parse_url((string) config('app.url'));
 
-        $scheme = $appUrl['scheme'] ?? 'http';
+        $domains = array_values(array_filter(
+            config('tenancy.central_domains', []),
+            fn ($domain) => ! in_array($domain, ['localhost', '127.0.0.1'], true)
+        ));
+
+        $centralHost = $domains[0]
+            ?? (in_array($request->getHost(), ['localhost', '127.0.0.1'], true)
+                ? config('app.central_domain', $request->getHost())
+                : $request->getHost());
+
         $port = isset($appUrl['port']) ? ':'.$appUrl['port'] : '';
-        $centralHost = config('tenancy.central_domains')[0];
+
+        $scheme = str_ends_with($centralHost, '.onrender.com')
+            ? 'https'
+            : ($request->getScheme() ?: ($appUrl['scheme'] ?? 'http'));
 
         return Inertia::render('Access', [
             'adminUrl' => $scheme.'://'.$centralHost.$port.'/admin',
